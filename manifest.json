@@ -1,0 +1,7 @@
+{
+  "name": "fat-chat-ftw",
+  "short_name": "fat-chat-ftw",
+  "description": "A test chat application",
+  "start_url": "/",
+  "display": "standalone"
+}
