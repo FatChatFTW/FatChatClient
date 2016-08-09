@@ -11,7 +11,7 @@
         display: block;
       }
     </style>
-
+    
     <app-location route="{{route}}"></app-location>
     <app-route route="{{route}}" pattern="/overview" active="{{overview}}"></app-route>
     <app-route route="{{route}}" pattern="/chat/:chat" tail="{{chatRoute}}" data="{{chatData}}" active="{{chat}}"></app-route>
@@ -57,6 +57,7 @@
   </template>
 
   <script>
+  
     Polymer({
       is: 'fat-chat-ftw-app',
       ready: function() {
