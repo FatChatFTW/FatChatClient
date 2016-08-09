@@ -19,9 +19,9 @@
 
     <h4>Navigation</h4>
     <ul>
-      <li><a href="#/overview">User Overview Page [visible = {{overview}}]</a></li>
-      <li><a href="#/chat/78">Chat Page [visible = {{chat}}]</a></li>
-      <li><a href="#/room/25">Room Page [visible = {{room}}]</a></li>
+      <li><a href="/overview">User Overview Page [visible = {{overview}}]</a></li>
+      <li><a href="/chat/78">Chat Page [visible = {{chat}}]</a></li>
+      <li><a href="/room/25">Room Page [visible = {{room}}]</a></li>
     </ul>
     
   	<!-- Overview -->
@@ -47,7 +47,7 @@
     </div>  
 
     <div hidden$="{{!chat}}">
-      TODO: Chat implementation
+      TODO: Chat implementation: {{chatData.chat}}
     </div>
 
     <div hidden$="{{!room}}">
