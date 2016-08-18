@@ -1,0 +1,39 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+
+<dom-module id="fat-chat-client">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <!-- Routing -->
+    <app-route route="{{route}}" pattern="/:id" data="{{user}}"></app-route>
+    
+     TODO: Chat client implementation [[user.id]]
+     
+  </template>
+
+  <script>
+  
+    Polymer({
+      is: 'fat-chat-client',
+      properties: {
+        route: {
+          type: Object,
+          readOnly: false,
+          notify: true
+        }
+      },
+      logger: function(obj) {
+        console.log(obj);
+      }
+    });
+  </script>
+</dom-module>

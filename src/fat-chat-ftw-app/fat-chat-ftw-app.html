@@ -1,8 +1,6 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
-<link rel="import" href="../../bower_components/app-route/app-route.html">
-<link rel="import" href="../../bower_components/app-route/app-location.html">
-<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../fat-chat-login/fat-chat-login.html">
+<link rel="import" href="../fat-chat-overview/fat-chat-overview.html">
+<link rel="import" href="../fat-chat-client/fat-chat-client.html">
 
 <dom-module id="fat-chat-ftw-app">
   <template>
@@ -12,63 +10,35 @@
       }
     </style>
     
-    <app-location route="{{route}}"></app-location>
-    <app-route route="{{route}}" pattern="/overview" active="{{overview}}"></app-route>
-    <app-route route="{{route}}" pattern="/chat/:chat" tail="{{chatRoute}}" data="{{chatData}}" active="{{chat}}"></app-route>
-    <app-route route="{{route}}" pattern="/room/:room" tail="{{roomRoute}}" data="{{roomData}}" active="{{room}}"></app-route>
+    <!-- Routing -->
+    <app-location use-hash-as-path route="{{route}}"></app-location>
+    <app-route route="{{route}}" pattern="/:view" data="{{data}}" tail="{{tail}}"></app-route>
 
-    <h4>Navigation</h4>
-    <ul>
-      <li><a href="/overview">User Overview Page [visible = {{overview}}]</a></li>
-      <li><a href="/chat/78">Chat Page [visible = {{chat}}]</a></li>
-      <li><a href="/room/25">Room Page [visible = {{room}}]</a></li>
-    </ul>
-    
-  	<!-- Overview -->
-    <!--<div hidden$="{{!overview}}"> -->
+    <!-- Navigation Test -->
+    <h4>Test Navigation</h4>
     <div>
-    	<firebase-app
-    	  auth-domain="fat-chat-ftw.firebaseapp.com"
-    		database-url="https://fat-chat-ftw.firebaseio.com"
-    		api-key="AIzaSyDWMntDTDLVwWNNMdi9m8kC1yOUETx4hCo">
-    	</firebase-app>  	
-    	<firebase-query
-    	    id="query"
-    	    path="/users"
-    	    data="{{users}}">
-    	</firebase-query>
-  
-      <h4>User Overview</h4>
-      <ul>
-      	<template is="dom-repeat" items="[[users]]" as="user">
-      		<li>[[user.name]]</li>
-      	</template>
-      </ul>
-    </div>  
-
-    <div hidden$="{{!chat}}">
-      TODO: Chat implementation: {{chatData.chat}}
+      <a href="#/login">Login</a> | 
+      <a href="#/overview">Overview</a> | 
+      <a href="#/chat/78">Chat</a>
     </div>
-
-    <div hidden$="{{!room}}">
-      TODO: Room implementation
-    </div>
-
+    
+    <!-- Views -->
+    <iron-pages selected="[[data.view]]" attr-for-selected="name">
+      <fat-chat-login name="login"></fat-chat-login>
+      <fat-chat-overview name="overview"></fat-chat-overview>
+      <fat-chat-client name="chat" route="{{tail}}"></fat-chat-client>
+    </iron-pages>
+    
   </template>
 
   <script>
   
     Polymer({
       is: 'fat-chat-ftw-app',
-      ready: function() {
-        this.async(function() {
-          // If the path is blank, redirect to /
-          if (!this.route.path) {
-            this.set('route.path', '/');
-          }
-        });
-      },
       properties: {
+      },
+      logger: function(obj) {
+        console.log(obj);
       }
     });
   </script>
