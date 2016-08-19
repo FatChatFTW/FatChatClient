@@ -23,12 +23,12 @@ paper-scroll-header-panel .content {
   padding: 8px;
 }
 
-.header-content-spacing {
+paper-toolbar #username, paper-toolbar #profile{
   padding-left: 5px;
   padding-right: 5px;
 }
 
-.logout {
+paper-toolbar .logout {
   display: none;
 }
 
