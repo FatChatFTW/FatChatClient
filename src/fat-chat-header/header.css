@@ -1,0 +1,45 @@
+:host {
+  display: block;
+  font-family: Helvetica, Arial, sans-serif;
+}
+paper-scroll-header-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #eee;
+}
+
+paper-toolbar {
+  background-color: #4285f4;
+}
+
+paper-toolbar .title {
+  margin: 0 8px;
+}
+
+paper-scroll-header-panel .content {
+  padding: 8px;
+}
+
+.header-content-spacing {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.logout {
+  display: none;
+}
+
+paper-icon-button {
+  --paper-icon-button-ink-color: white;
+}
+
+.spacer {
+  @apply(--layout-flex);
+}
+.header-image-avatar {
+  border-radius: 22px;
+  width: 44px;
+}

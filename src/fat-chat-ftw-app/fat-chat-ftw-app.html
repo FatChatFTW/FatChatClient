@@ -1,6 +1,7 @@
 <link rel="import" href="../fat-chat-login/fat-chat-login.html">
 <link rel="import" href="../fat-chat-overview/fat-chat-overview.html">
 <link rel="import" href="../fat-chat-client/fat-chat-client.html">
+<link rel="import" href="../fat-chat-header/fat-chat-header.html">
 
 <dom-module id="fat-chat-ftw-app">
   <template>
@@ -14,32 +15,32 @@
     <app-location use-hash-as-path route="{{route}}"></app-location>
     <app-route route="{{route}}" pattern="/:view" data="{{data}}" tail="{{tail}}"></app-route>
 
+
     <!-- Navigation Test -->
-    <h4>Test Navigation</h4>
-    <div>
-      <a href="#/login">Login</a> | 
-      <a href="#/overview">Overview</a> | 
-      <a href="#/chat/78">Chat</a>
-    </div>
-    
-    <!-- Views -->
-    <iron-pages selected="[[data.view]]" attr-for-selected="name">
-      <fat-chat-login name="login"></fat-chat-login>
-      <fat-chat-overview name="overview"></fat-chat-overview>
-      <fat-chat-client name="chat" route="{{tail}}"></fat-chat-client>
-    </iron-pages>
+    <fat-chat-header>
+      <!-- Views -->
+      <iron-pages selected="[[data.view]]" attr-for-selected="name" >
+        <fat-chat-overview name="overview"></fat-chat-overview>
+        <fat-chat-client name="chat" route="{{tail}}"></fat-chat-client>
+      </iron-pages>
+    </fat-chat-header>
+
+
     
   </template>
 
   <script>
-  
+
     Polymer({
       is: 'fat-chat-ftw-app',
-      properties: {
-      },
-      logger: function(obj) {
+       logger: function(obj) {
         console.log(obj);
+      },
+      ready: function() {
+          var pages = document.querySelector('iron-pages');
+          pages.select('overview');
       }
+
     });
   </script>
 </dom-module>
