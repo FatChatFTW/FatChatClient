@@ -34,7 +34,7 @@
         </paper-menu-button>
 
         <div class="spacer title">Chat client</div>
-        <div class="header-content-spacing">[[userName]]</div>
+        <div class="header-content-spacing [[status]]">[[userName]]</div>
         <div class="header-content-spacing [[status]]"><img class="header-image-avatar" src="[[googleProfileUrl]]"/></div>
         <div>
           <google-signin client-id="44236737009-ov2f3aq0qjfrqpf6bocr3c95pgjv8ak1.apps.googleusercontent.com" signed-in="{{signedIn}}"></google-signin>
@@ -54,16 +54,24 @@
     Polymer({
       is: 'fat-chat-header',
       properties: {
+        userid: {
+          type: String,
+          value: false,
+          notify: true,
+          reflectToAttribute: true
+        }
       },
       handleSignIn : function() {
         this.status = 'login';
         this.userName = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getName();
         this.googleProfileUrl = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getImageUrl();
+        this.userid = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getId();
       },
       handleSignOut : function() {
         this.status = 'logout';
         this.userName = '';
         this.googleProfileUrl = '';
+        this.userid = '';
       }
     });
   </script>

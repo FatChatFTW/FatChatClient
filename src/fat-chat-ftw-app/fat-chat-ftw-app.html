@@ -17,10 +17,10 @@
 
 
     <!-- Navigation Test -->
-    <fat-chat-header>
+    <fat-chat-header userid="{{userId}}">
       <!-- Views -->
       <iron-pages selected="[[data.view]]" attr-for-selected="name" >
-        <fat-chat-overview name="overview"></fat-chat-overview>
+        <fat-chat-overview name="overview" userid="[[userId]]"></fat-chat-overview>
         <fat-chat-client name="chat" route="{{tail}}"></fat-chat-client>
       </iron-pages>
     </fat-chat-header>
