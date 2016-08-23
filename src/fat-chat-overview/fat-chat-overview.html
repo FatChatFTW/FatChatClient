@@ -50,10 +50,12 @@
     </firebase-query>
 
 
+
     <div class="content">
-      <template is="dom-repeat" items="[[chats]]" as="chat">
+      <template is="dom-repeat" items="[[chats]]" as="chat"  >
         <div class="chat-unread-[[chat.unread]]">
-        <paper-material >
+          <input chatid="[[chat.$key]]" value="{{chat.name::input}}" onchange="document.querySelector('#query').setStoredValue(document.querySelector('#query').path + '/' + this.chatid +'/name',this.value);"/>
+          <paper-material >
           <div class="container" tabindex="0">
             <span>[[chat.name]]</span>
             <paper-badge label="[[chat.unread]]" ></paper-badge>
