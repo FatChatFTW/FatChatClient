@@ -4,9 +4,11 @@
 <link rel="import" href="../../bower_components/app-route/app-location.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../fat-chat-shared-styles/fat-chat-shared-styles.html"/>
 
 <dom-module id="fat-chat-client">
   <template>
+    <style include="shared-styles"/>
     <style>
       :host {
         display: block;
@@ -15,9 +17,25 @@
 
     <!-- Routing -->
     <app-route route="{{route}}" pattern="/:id" data="{{user}}"></app-route>
-    
-     TODO: Chat client implementation [[user.id]]
-     
+
+    <firebase-query
+            id="query"
+            path="/users2"
+            data="{{users}}">
+    </firebase-query>
+
+    <div class="content">
+      <template is="dom-repeat" items="[[users]]" as="user"  >
+        <div class="user">
+          <paper-material >
+            <div class="container" tabindex="0">
+              <span>[[user.name]]</span>
+            </div>
+          </paper-material>
+        </div>
+      </template>
+    </div>
+
   </template>
 
   <script>
