@@ -18,8 +18,10 @@
         <firebase-query
                 id="query2"
                 path="/users2/[[userid]]/conversations/[[cid]]/messages"
-                data="{{messages}}">
+                data="{{messages}}"
+                order-by-child="time">
         </firebase-query>
+        
         <firebase-document
                 path="/users2/[[userid]]/conversations/[[cid]]"
                 data="{{conversation}}">
@@ -43,7 +45,7 @@
                     </div>
                 </paper-material>
             </div>
-        </div>
+       </div>
 
     </template>
 

@@ -8,6 +8,7 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-scroll-header-panel/paper-scroll-header-panel.html">
+<link rel="import" href="../behaviors/fat-behavior.html">
 
 <dom-module id="fat-chat-header">
     <link rel="import" type="css" href="header.css">
@@ -17,6 +18,19 @@
                 display: block;
             }
         </style>
+      
+      <firebase-app
+        auth-domain="fat-chat-ftw.firebaseapp.com"
+  		  database-url="https://fat-chat-ftw.firebaseio.com"
+  		  api-key="AIzaSyDWMntDTDLVwWNNMdi9m8kC1yOUETx4hCo">
+  	  </firebase-app> 
+  	
+       <firebase-document
+          id="users"
+          path="/users2"
+          data="{{users2}}">
+        </firebase-document>
+    
         <paper-scroll-header-panel fixed>
 
             <paper-toolbar>
@@ -56,6 +70,7 @@
 
         Polymer({
             is: 'fat-chat-header',
+            behaviors: [FAT],
             properties: {
                 userid: {
                     type: String,
@@ -73,6 +88,14 @@
                 this.userName = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getName();
                 this.googleProfileUrl = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getImageUrl();
                 this.userid = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getId();
+                
+                var user = this.$.users.getStoredValue('/users2/' + this.userid);
+                if (this.$.users.valueIsEmpty(user)) {
+                  FAT.storeValue(this.$.users, '/users2/', this.userid, {
+                    conversations: {},
+                    name: this.userName
+                  })
+                }
             },
             handleSignOut: function () {
                 this.status = 'logout';
