@@ -13,61 +13,59 @@
 <link rel="import" href="../fat-chat-shared-styles/fat-chat-shared-styles.html"/>
 
 <dom-module id="fat-chat-overview">
-  <template>
-    <style include="shared-styles"/>
-    <style is="custom-style">
-      :host {
-        display: block;
-        font-family: Helvetica, Arial, sans-serif;
-      }
+    <template>
+        <style include="shared-styles"/>
+        <style is="custom-style">
+            :host {
+                display: block;
+                font-family: Helvetica, Arial, sans-serif;
+            }
 
-      /* Need to position the badge to look like a text superscript */
-      .container > paper-badge {
-        --paper-badge-margin-left: 20px;
-        --paper-badge-margin-bottom: 0px;
-      }
-
-
-    </style>
-    
-    <firebase-app
-      auth-domain="fat-chat-ftw.firebaseapp.com"
-  		database-url="https://fat-chat-ftw.firebaseio.com"
-  		api-key="AIzaSyDWMntDTDLVwWNNMdi9m8kC1yOUETx4hCo">
-  	</firebase-app>  	
-    <firebase-query
-        id="query"
-        path="/users/[[userid]]/chats"
-        data="{{chats}}">
-    </firebase-query>
+            /* Need to position the badge to look like a text superscript */
+            .container > paper-badge {
+                --paper-badge-margin-left: 20px;
+                --paper-badge-margin-bottom: 0px;
+            }
 
 
+        </style>
 
-    <div class="content">
-      <template is="dom-repeat" items="[[chats]]" as="chat"  >
-        <div class="chat-unread-[[chat.unread]]">
-          <input chatid="[[chat.$key]]" value="{{chat.name::input}}" onchange="document.querySelector('#query').setStoredValue(document.querySelector('#query').path + '/' + this.chatid +'/name',this.value);"/>
-          <paper-material >
-          <div class="container" tabindex="0">
-            <span>[[chat.name]]</span>
-            <paper-badge label="[[chat.unread]]" ></paper-badge>
-          </div>
-        </paper-material>
+        <firebase-app
+                auth-domain="fat-chat-ftw.firebaseapp.com"
+                database-url="https://fat-chat-ftw.firebaseio.com"
+                api-key="AIzaSyDWMntDTDLVwWNNMdi9m8kC1yOUETx4hCo">
+        </firebase-app>
+        <firebase-query
+                id="query"
+                path="/users2/[[userid]]/conversations"
+                data="{{conversations}}">
+        </firebase-query>
+
+
+        <div class="content">
+            <template is="dom-repeat" items="[[conversations]]" as="conversation">
+                <div class="chat-unread-[[chat.unread]]">
+                    <!--<input conversationid="[[conversation.$key]]" value="{{conversation.name::input}}" onchange="document.querySelector('#query').setStoredValue(document.querySelector('#query').path + '/' + this.conversationid +'/name',this.value);"/>-->
+                    <paper-material>
+                        <div class="container" tabindex="0">
+                            <span><a href="#/screen/[[conversation.$key]]">[[conversation.name]]</a></span>
+                            <paper-badge label="0"></paper-badge>
+                        </div>
+                    </paper-material>
+                </div>
+            </template>
         </div>
-      </template>
-    </div>
 
-  </template>
+    </template>
 
-  <script>
-  
-    Polymer({
-      is: 'fat-chat-overview',
-      properties: {
-      },
-      logger: function(obj) {
-        console.log(obj);
-      }
-    });
-  </script>
+    <script>
+
+        Polymer({
+            is: 'fat-chat-overview',
+            properties: {},
+            logger: function (obj) {
+                console.log(obj);
+            }
+        });
+    </script>
 </dom-module>

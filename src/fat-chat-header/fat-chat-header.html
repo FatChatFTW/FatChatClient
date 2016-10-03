@@ -10,69 +10,85 @@
 <link rel="import" href="../../bower_components/paper-scroll-header-panel/paper-scroll-header-panel.html">
 
 <dom-module id="fat-chat-header">
-  <link rel="import" type="css" href="header.css">
-  <template>
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
-    <paper-scroll-header-panel fixed>
+    <link rel="import" type="css" href="header.css">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+        <paper-scroll-header-panel fixed>
 
-      <paper-toolbar>
-        <paper-menu-button>
-          <paper-icon-button icon="menu" class="dropdown-trigger"></paper-icon-button>
-          <paper-menu class="dropdown-content">
-            <a class="paper-item-link" href="#/overview" tabindex="-1">
-              <paper-item>Overview</paper-item>
-            </a>
-            <a class="paper-item-link" href="#/chat" tabindex="-1">
-              <paper-item>Chat</paper-item>
-            </a>
-            <paper-item>Help</paper-item>
-          </paper-menu>
-        </paper-menu-button>
+            <paper-toolbar>
+                <paper-menu-button>
+                    <paper-icon-button icon="menu" class="dropdown-trigger"></paper-icon-button>
+                    <paper-menu class="dropdown-content">
+                        <a class="paper-item-link" href="#/overview" tabindex="-1">
+                            <paper-item>Overview</paper-item>
+                        </a>
+                        <a class="paper-item-link" href="#/chat" tabindex="-1">
+                            <paper-item>New chat</paper-item>
+                        </a>
+                        <paper-item>Help</paper-item>
+                    </paper-menu>
+                </paper-menu-button>
 
-        <div class="spacer title">Chat client</div>
-        <div id="username" class="[[status]]">[[userName]]</div>
-        <div id="profile" class="[[status]]"><img class="header-image-avatar" src="[[googleProfileUrl]]"/></div>
-        <div>
-          <google-signin client-id="44236737009-ov2f3aq0qjfrqpf6bocr3c95pgjv8ak1.apps.googleusercontent.com" signed-in="{{signedIn}}"></google-signin>
-          <google-signin-aware client-id="44236737009-ov2f3aq0qjfrqpf6bocr3c95pgjv8ak1.apps.googleusercontent.com"
-                               signed-in="{{signedIn}}"
-                               is-authorized="{{isAuthorized}}" on-google-signin-aware-success="handleSignIn" on-google-signin-aware-signed-out="handleSignOut"></google-signin-aware>
-        </div>
-      </paper-toolbar>
-      <content id="mainContent" select="*"></content>
-    </paper-scroll-header-panel>
+                <div class="spacer title">[[_headerText(page)]]</div>
+                <div id="username" class="[[status]]">[[userName]]</div>
+                <div id="profile" class="[[status]]"><img class="header-image-avatar" src="[[googleProfileUrl]]"/></div>
+                <div>
+                    <google-signin client-id="44236737009-ov2f3aq0qjfrqpf6bocr3c95pgjv8ak1.apps.googleusercontent.com"
+                                   signed-in="{{signedIn}}"></google-signin>
+                    <google-signin-aware
+                            client-id="44236737009-ov2f3aq0qjfrqpf6bocr3c95pgjv8ak1.apps.googleusercontent.com"
+                            signed-in="{{signedIn}}"
+                            is-authorized="{{isAuthorized}}" on-google-signin-aware-success="handleSignIn"
+                            on-google-signin-aware-signed-out="handleSignOut"></google-signin-aware>
+                </div>
+            </paper-toolbar>
+            <content id="mainContent" select="*"></content>
+        </paper-scroll-header-panel>
 
 
-  </template>
+    </template>
 
-  <script>
-  
-    Polymer({
-      is: 'fat-chat-header',
-      properties: {
-        userid: {
-          type: String,
-          value: false,
-          notify: true,
-          reflectToAttribute: true
-        }
-      },
-      handleSignIn : function() {
-        this.status = 'login';
-        this.userName = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getName();
-        this.googleProfileUrl = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getImageUrl();
-        this.userid = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getId();
-      },
-      handleSignOut : function() {
-        this.status = 'logout';
-        this.userName = '';
-        this.googleProfileUrl = '';
-        this.userid = '';
-      }
-    });
-  </script>
+    <script>
+
+        Polymer({
+            is: 'fat-chat-header',
+            properties: {
+                userid: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                page: {
+                    type: String,
+                    notify: true
+                }
+            },
+            handleSignIn: function () {
+                this.status = 'login';
+                this.userName = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getName();
+                this.googleProfileUrl = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getImageUrl();
+                this.userid = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getId();
+            },
+            handleSignOut: function () {
+                this.status = 'logout';
+                this.userName = '';
+                this.googleProfileUrl = '';
+                this.userid = '';
+            },
+            _headerText: function (page) {
+                if (page === 'chat') {
+                    return 'Start new chat';
+                } else if (page === 'overview') {
+                    return 'Overview of existing chats';
+                } else {
+                    return 'Current chat';
+                }
+            }
+        });
+    </script>
 </dom-module>

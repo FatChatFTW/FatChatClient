@@ -7,51 +7,42 @@
 <link rel="import" href="../fat-chat-shared-styles/fat-chat-shared-styles.html"/>
 
 <dom-module id="fat-chat-client">
-  <template>
-    <style include="shared-styles"/>
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+    <template>
+        <style include="shared-styles"/>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
 
-    <!-- Routing -->
-    <app-route route="{{route}}" pattern="/:id" data="{{user}}"></app-route>
+        <firebase-query
+                id="query"
+                path="/users2"
+                data="{{users}}">
+        </firebase-query>
 
-    <firebase-query
-            id="query"
-            path="/users2"
-            data="{{users}}">
-    </firebase-query>
-
-    <div class="content">
-      <template is="dom-repeat" items="[[users]]" as="user"  >
-        <div class="user">
-          <paper-material >
-            <div class="container" tabindex="0">
-              <span>[[user.name]]</span>
-            </div>
-          </paper-material>
+        <div class="content">
+            <template is="dom-repeat" items="[[users]]" as="user">
+                <div class="user">
+                    <paper-material>
+                        <div class="container" tabindex="0">
+                            <span>[[user.name]]</span>
+                        </div>
+                    </paper-material>
+                </div>
+            </template>
         </div>
-      </template>
-    </div>
 
-  </template>
+    </template>
 
-  <script>
-  
-    Polymer({
-      is: 'fat-chat-client',
-      properties: {
-        route: {
-          type: Object,
-          readOnly: false,
-          notify: true
-        }
-      },
-      logger: function(obj) {
-        console.log(obj);
-      }
-    });
-  </script>
+    <script>
+
+        Polymer({
+            is: 'fat-chat-client',
+            properties: {},
+            logger: function (obj) {
+                console.log(obj);
+            }
+        });
+    </script>
 </dom-module>

@@ -1,0 +1,82 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../fat-chat-shared-styles/fat-chat-shared-styles.html"/>
+
+<dom-module id="fat-chat-screen">
+    <template>
+        <style include="shared-styles"/>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+
+        <firebase-query
+                id="query2"
+                path="/users2/[[userid]]/conversations/[[cid]]/messages"
+                data="{{messages}}">
+        </firebase-query>
+        <firebase-document
+                path="/users2/[[userid]]/conversations/[[cid]]"
+                data="{{conversation}}">
+        </firebase-document>
+
+        <div class="content">
+            <span>[[conversation.name]]</span>
+            <template is="dom-repeat" items="[[messages]]" as="message">
+                <div class="message">
+                    <paper-material>
+                        <div class="container" tabindex="0">
+                            <span class="width:100%;">[[message.message]]<br><br>sender : [[message.sender]]<br>time : [[message.time]]</span>
+                        </div>
+                    </paper-material>
+                </div>
+            </template>
+            <div class="message">
+                <paper-material>
+                    <div class="container" tabindex="0">
+                        <span><input user="[[userid]]" onchange="createMessage(this.value, this.user);this.value='';"/></span>
+                    </div>
+                </paper-material>
+            </div>
+        </div>
+
+    </template>
+
+    <script>
+
+        Polymer({
+            is: 'fat-chat-screen',
+            properties: {
+                cid: String
+            },
+            logger: function (obj) {
+                console.log(obj);
+            }
+        });
+
+        function guid() {
+            function s4() {
+                return Math.floor((1 + Math.random()) * 0x10000)
+                        .toString(16)
+                        .substring(1);
+            }
+
+            return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+                    s4() + '-' + s4() + s4() + s4();
+        }
+
+        function createMessage(message, userid) {
+            var msg = {};
+            msg.message = message;
+            msg.sender = userid;
+            msg.time = Date.now();
+            document.querySelector('#query2').setStoredValue(document.querySelector('#query2').path + '/' + guid(), msg);
+        }
+
+    </script>
+</dom-module>

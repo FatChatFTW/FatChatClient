@@ -7,31 +7,30 @@
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 
 <dom-module id="fat-chat-login">
-  <template>
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
 
-    <paper-card heading="Login" image="/assets/img/fat.jpg" alt="Login">
-      <div class="card-content">Please log in with Google to use Fat-Chat.</div>
-      <div class="card-actions">
-        <paper-button>Login</paper-button>
-      </div>
-    </paper-card>
+        <paper-card heading="Login" image="/assets/img/fat.jpg" alt="Login">
+            <div class="card-content">Please log in with Google to use Fat-Chat.</div>
+            <div class="card-actions">
+                <paper-button>Login</paper-button>
+            </div>
+        </paper-card>
 
-  </template>
+    </template>
 
-  <script>
-  
-    Polymer({
-      is: 'fat-chat-login',
-      properties: {
-      },
-      logger: function(obj) {
-        console.log(obj);
-      }
-    });
-  </script>
+    <script>
+
+        Polymer({
+            is: 'fat-chat-login',
+            properties: {},
+            logger: function (obj) {
+                console.log(obj);
+            }
+        });
+    </script>
 </dom-module>

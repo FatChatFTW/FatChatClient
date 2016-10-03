@@ -1,46 +1,46 @@
 <link rel="import" href="../fat-chat-login/fat-chat-login.html">
 <link rel="import" href="../fat-chat-overview/fat-chat-overview.html">
 <link rel="import" href="../fat-chat-client/fat-chat-client.html">
+<link rel="import" href="../fat-chat-screen/fat-chat-screen.html">
 <link rel="import" href="../fat-chat-header/fat-chat-header.html">
 
 <dom-module id="fat-chat-ftw-app">
-  <template>
-    <style>
-      :host {
-        display: block;
-      }
-    </style>
-    
-    <!-- Routing -->
-    <app-location use-hash-as-path route="{{route}}"></app-location>
-    <app-route route="{{route}}" pattern="/:view" data="{{data}}" tail="{{tail}}"></app-route>
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+
+        <!-- Routing -->
+        <app-location use-hash-as-path route="{{route}}"></app-location>
+        <app-route route="{{route}}" pattern="/:view" data="{{data}}" tail="{{subroute}}"></app-route>
+        <app-route route="{{subroute}}" pattern="/:cid" data="{{subdata}}"></app-route>
 
 
-    <!-- Navigation Test -->
-    <fat-chat-header userid="{{userId}}">
-      <!-- Views -->
-      <iron-pages selected="[[data.view]]" attr-for-selected="name" >
-        <fat-chat-overview name="overview" userid="[[userId]]"></fat-chat-overview>
-        <fat-chat-client name="chat" route="{{tail}}"></fat-chat-client>
-      </iron-pages>
-    </fat-chat-header>
+        <!-- Navigation Test -->
+        <fat-chat-header userid="{{userId}}" page="[[data.view]]">
+            <!-- Views -->
+            <iron-pages selected="[[data.view]]" attr-for-selected="name">
+                <fat-chat-overview name="overview" userid="[[userId]]"></fat-chat-overview>
+                <fat-chat-client name="chat"></fat-chat-client>
+                <fat-chat-screen name="screen" userid="[[userId]]" cid="[[subdata.cid]]"></fat-chat-screen>
+            </iron-pages>
+        </fat-chat-header>
 
+    </template>
 
-    
-  </template>
+    <script>
 
-  <script>
-
-    Polymer({
-      is: 'fat-chat-ftw-app',
-       logger: function(obj) {
-        console.log(obj);
-      },
-      ready: function() {
-          var pages = document.querySelector('iron-pages');
-          pages.select('overview');
-      }
-
-    });
-  </script>
+        Polymer({
+            is: 'fat-chat-ftw-app',
+            logger: function (obj) {
+                console.log(obj);
+            },
+            ready: function () {
+                var pages = document.querySelector('iron-pages');
+                pages.select('overview');
+            }
+        });
+    </script>
 </dom-module>
