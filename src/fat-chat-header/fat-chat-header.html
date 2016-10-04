@@ -115,7 +115,7 @@
                 //_createUser();
             },
             _createUser: function() {
-                FAT.storeValue(this.$.users, '/users2/', this.googleId, {
+                FAT.storeValue(this.$.user, '/users2/', this.googleId, {
                     conversations: { newMessageCount: 0 },
                     name: this.userName
                 });
