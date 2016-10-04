@@ -12,6 +12,14 @@
             }
         </style>
 
+        <!-- Setup Database -->
+        <firebase-app
+            name="fat-data"
+            auth-domain="fat-chat-ftw.firebaseapp.com"
+            database-url="https://fat-chat-ftw.firebaseio.com"
+            api-key="AIzaSyDWMntDTDLVwWNNMdi9m8kC1yOUETx4hCo">
+        </firebase-app> 
+
         <!-- Routing -->
         <app-location use-hash-as-path route="{{route}}"></app-location>
         <app-route route="{{route}}" pattern="/:view" data="{{data}}" tail="{{subroute}}"></app-route>

@@ -19,18 +19,6 @@
             }
         </style>
       
-      <firebase-app
-        auth-domain="fat-chat-ftw.firebaseapp.com"
-  		  database-url="https://fat-chat-ftw.firebaseio.com"
-  		  api-key="AIzaSyDWMntDTDLVwWNNMdi9m8kC1yOUETx4hCo">
-  	  </firebase-app> 
-  	
-       <firebase-document
-          id="users"
-          path="/users2"
-          data="{{users2}}">
-        </firebase-document>
-    
         <paper-scroll-header-panel fixed>
 
             <paper-toolbar>
@@ -62,7 +50,15 @@
             </paper-toolbar>
             <content id="mainContent" select="*"></content>
         </paper-scroll-header-panel>
-
+  	
+        <firebase-document
+            app-name="fat-data"
+            id="user"
+            path="/users2/[[googleId]]"
+            data="{{userData}}"
+            disabled="true"
+            log="true">
+        </firebase-document>
 
     </template>
 
@@ -72,11 +68,16 @@
             is: 'fat-chat-header',
             behaviors: [FAT],
             properties: {
-                userid: {
+                googleId: {
                     type: String,
                     value: false,
                     notify: true,
                     reflectToAttribute: true
+                },
+                userData: {
+                    type: Object,
+                    notify: false,
+                    observer: '_userDataChange'
                 },
                 page: {
                     type: String,
@@ -87,21 +88,14 @@
                 this.status = 'login';
                 this.userName = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getName();
                 this.googleProfileUrl = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getImageUrl();
-                this.userid = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getId();
-                
-                var user = this.$.users.getStoredValue('/users2/' + this.userid);
-                if (this.$.users.valueIsEmpty(user)) {
-                  FAT.storeValue(this.$.users, '/users2/', this.userid, {
-                    conversations: {},
-                    name: this.userName
-                  })
-                }
+                this.googleId = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getId();
+                this.$.user.disabled = false;
             },
             handleSignOut: function () {
                 this.status = 'logout';
                 this.userName = '';
                 this.googleProfileUrl = '';
-                this.userid = '';
+                this.googleId = false;
             },
             _headerText: function (page) {
                 if (page === 'chat') {
@@ -111,6 +105,20 @@
                 } else {
                     return 'Current chat';
                 }
+            },
+            _userDataChange: function() {
+                
+                if (this.$.user.disabled) return;
+                if (this.userData.hasOwnProperty("name")) return;
+
+                console.log('User not found, create new user!');
+                //_createUser();
+            },
+            _createUser: function() {
+                FAT.storeValue(this.$.users, '/users2/', this.googleId, {
+                    conversations: { newMessageCount: 0 },
+                    name: this.userName
+                });
             }
         });
     </script>
