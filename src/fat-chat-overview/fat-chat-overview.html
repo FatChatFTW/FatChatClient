@@ -9,7 +9,7 @@
 <link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/paper-badge/paper-badge.html">
-
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../fat-chat-shared-styles/fat-chat-shared-styles.html"/>
 
 <dom-module id="fat-chat-overview">
@@ -30,15 +30,12 @@
 
         </style>
 
-<!--        <firebase-app
-                auth-domain="fat-chat-ftw.firebaseapp.com"
-                database-url="https://fat-chat-ftw.firebaseio.com"
-                api-key="AIzaSyDWMntDTDLVwWNNMdi9m8kC1yOUETx4hCo">
-        </firebase-app>-->
         <firebase-query
-                id="query"
+                app-name="fat-data"
+                id="conversationsQuery"
                 path="/users2/[[userid]]/conversations"
-                data="{{conversations}}">
+                data="{{conversations}}"
+                log="true">
         </firebase-query>
 
 
@@ -63,8 +60,8 @@
         Polymer({
             is: 'fat-chat-overview',
             properties: {},
-            logger: function (obj) {
-                console.log(obj);
+            ready: function () {
+                console.log(this.$.conversationsQuery.path)
             }
         });
     </script>

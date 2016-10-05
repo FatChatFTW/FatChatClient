@@ -16,6 +16,7 @@
         </style>
 
         <firebase-query
+                app-name="fat-data"
                 id="query2"
                 path="/users2/[[userid]]/conversations/[[cid]]/messages"
                 data="{{messages}}"
@@ -23,6 +24,7 @@
         </firebase-query>
         
         <firebase-document
+                app-name="fat-data"
                 path="/users2/[[userid]]/conversations/[[cid]]"
                 data="{{conversation}}">
         </firebase-document>

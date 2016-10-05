@@ -54,10 +54,9 @@
         <firebase-document
             app-name="fat-data"
             id="user"
-            path="/users2/[[googleId]]"
+            path="/users2/{{userid}}"
             data="{{userData}}"
-            disabled="true"
-            log="true">
+            disabled="true">
         </firebase-document>
 
     </template>
@@ -68,7 +67,7 @@
             is: 'fat-chat-header',
             behaviors: [FAT],
             properties: {
-                googleId: {
+                userid: {
                     type: String,
                     value: false,
                     notify: true,
@@ -88,14 +87,14 @@
                 this.status = 'login';
                 this.userName = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getName();
                 this.googleProfileUrl = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getImageUrl();
-                this.googleId = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getId();
+                this.userid = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getId();
                 this.$.user.disabled = false;
             },
             handleSignOut: function () {
                 this.status = 'logout';
                 this.userName = '';
                 this.googleProfileUrl = '';
-                this.googleId = false;
+                this.userid = false;
             },
             _headerText: function (page) {
                 if (page === 'chat') {
@@ -115,7 +114,7 @@
                 //_createUser();
             },
             _createUser: function() {
-                FAT.storeValue(this.$.user, '/users2/', this.googleId, {
+                FAT.storeValue(this.$.user, '/users2/', this.userid, {
                     conversations: { newMessageCount: 0 },
                     name: this.userName
                 });
