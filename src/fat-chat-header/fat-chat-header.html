@@ -111,7 +111,7 @@
                 if (this.userData.hasOwnProperty("name")) return;
 
                 console.log('User not found, create new user!');
-                _createUser();
+                this._createUser();
             },
             _createUser: function() {
                 FAT.storeValue(this.$.user, '/users2/', this.userid, {
