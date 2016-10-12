@@ -91,6 +91,7 @@
                 this.$.user.disabled = false;
             },
             handleSignOut: function () {
+                this.$.user.disabled = true;                
                 this.status = 'logout';
                 this.userName = '';
                 this.googleProfileUrl = '';
@@ -111,11 +112,10 @@
                 if (this.userData.hasOwnProperty("name")) return;
 
                 console.log('User not found, create new user!');
-                _createUser();
+                this._createUser();
             },
             _createUser: function() {
                 FAT.storeValue(this.$.user, '/users2/', this.userid, {
-                    conversations: { newMessageCount: 0 },
                     name: this.userName
                 });
             }
