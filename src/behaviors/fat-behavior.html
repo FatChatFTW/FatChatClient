@@ -6,7 +6,9 @@
 		  query.save(parent, key).then(function() {
 			  query.setStoredValue(parent + key, value);
 		  });
+    },
+    updateValue: function(query, path, value) {
+		  query.setStoredValue(path, value);
     }
   };
-  
 </script>

@@ -18,14 +18,14 @@
         <firebase-query
                 app-name="fat-data"
                 id="query2"
-                path="/users2/[[userid]]/conversations/[[cid]]/messages"
+                path="/users2/[[userId]]/conversations/[[cid]]/messages"
                 data="{{messages}}"
                 order-by-child="time">
         </firebase-query>
         
         <firebase-document
                 app-name="fat-data"
-                path="/users2/[[userid]]/conversations/[[cid]]"
+                path="/users2/[[userId]]/conversations/[[cid]]"
                 data="{{conversation}}">
         </firebase-document>
 
@@ -43,7 +43,7 @@
             <div class="message">
                 <paper-material>
                     <div class="container" tabindex="0">
-                        <span><input user="[[userid]]" onchange="createMessage(this.value, this.user);this.value='';"/></span>
+                        <span><input user="[[userId]]" onchange="createMessage(this.value, this.user);this.value='';"/></span>
                     </div>
                 </paper-material>
             </div>
@@ -74,10 +74,10 @@
                     s4() + '-' + s4() + s4() + s4();
         }
 
-        function createMessage(message, userid) {
+        function createMessage(message, userId) {
             var msg = {};
             msg.message = message;
-            msg.sender = userid;
+            msg.sender = userId;
             msg.time = Date.now();
             document.querySelector('#query2').setStoredValue(document.querySelector('#query2').path + '/' + guid(), msg);
         }

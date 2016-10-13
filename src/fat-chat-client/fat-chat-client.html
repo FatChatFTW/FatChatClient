@@ -22,7 +22,7 @@
                     <paper-material>
                         <div class="container" tabindex="0">
                             <span>[[user.name]]</span>
-                            <paper-button raised noink onclick="alert('This chat is FAT: TODO');">Chat</paper-button>
+                            <paper-button raised noink on-tap="initiateChat">Chat</paper-button>
                         </div>
                     </paper-material>
                 </div>
@@ -30,21 +30,20 @@
         </div>
 
         <firebase-query
-                app-name="fat-data"
-                id="query"
-                path="/users2"
-                data="{{users}}">
+            app-name="fat-data"
+            id="query"
+            path="/users2"
+            data="{{users}}">
         </firebase-query>
-
 
         <firebase-document
             app-name="fat-data"
-            id="user"
-            path="/users2/[[userid]]/conversations"
-            data="{{userData}}"
-            disabled="true">
+            id="conversations"
+            path="/users2/[[userId]]/conversations"
+            data="{{conversationData}}"
+            log="true">
         </firebase-document>
-        
+
     </template>
 
     <script>
@@ -53,8 +52,57 @@
             is: 'fat-chat-client',
             behaviours: [FAT],
             properties: {
+                userId: {
+                    type: String,
+                    notify: true
+                },
+                userName: {
+                    type: String,
+                    notify: true
+                },
+                conversationData: {
+                    type: Object,
+                    notify: true,
+                    observer: '_conversationDataChange'                    
+                },
+            },
+            initiateChat: function (e) {
+                var recipientId = e.model.user.$key;
+                var recipientName = e.model.user.name;
+                this._createConversation(recipientId, recipientName);
+            },
+            _createConversation: function(recipientId, recipientName) {
                 
-            }
+                var conversations = this.conversationData.hasOwnProperty("conversations") 
+                    ? this.conversationData.conversations
+                    : {};
+                    
+                var conversation = conversations.hasOwnProperty(recipientId)
+                    ? conversations[recipientId]
+                    : {};
+                    
+                if (!conversation.hasOwnProperty("members")) {
+                    conversation.name = recipientName;
+                    conversation.messages = {};
+                    conversation.members = {};
+                    conversation.members[this.userId] = this._createMember(this.userName);
+                    conversation.members[recipientId] = this._createMember(recipientName);
+                    conversations[recipientId] = conversation; 
+                }
+                
+                FAT.updateValue(this.$.conversations, this.$.conversations.path, conversations);
+
+            },            
+            _createMember: function(memberName) {
+                return {
+                    name: memberName
+                }
+            },
+            _conversationDataChange: function() {
+                console.log("User id = " + this.userId);
+                console.log(this.$.conversations.path);
+                console.log(this.conversationData);
+            }            
         });
     </script>
 </dom-module>

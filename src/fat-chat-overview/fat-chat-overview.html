@@ -33,16 +33,14 @@
         <firebase-query
                 app-name="fat-data"
                 id="conversationsQuery"
-                path="/users2/[[userid]]/conversations"
-                data="{{conversations}}"
-                log="true">
+                path="/users2/[[userId]]/conversations"
+                data="{{conversations}}">
         </firebase-query>
 
 
         <div class="content">
             <template is="dom-repeat" items="[[conversations]]" as="conversation">
                 <div class="chat-unread-[[chat.unread]]">
-                    <!--<input conversationid="[[conversation.$key]]" value="{{conversation.name::input}}" onchange="document.querySelector('#query').setStoredValue(document.querySelector('#query').path + '/' + this.conversationid +'/name',this.value);"/>-->
                     <paper-material>
                         <div class="container" tabindex="0">
                             <span><a href="#/screen/[[conversation.$key]]">[[conversation.name]]</a></span>
@@ -59,10 +57,7 @@
 
         Polymer({
             is: 'fat-chat-overview',
-            properties: {},
-            ready: function () {
-                console.log(this.$.conversationsQuery.path)
-            }
+            properties: {}
         });
     </script>
 </dom-module>

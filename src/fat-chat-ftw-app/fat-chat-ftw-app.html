@@ -27,12 +27,12 @@
 
 
         <!-- Navigation Test -->
-        <fat-chat-header userid="{{userId}}" page="[[data.view]]">
+        <fat-chat-header user-id="{{userId}}" user-name="{{userName}}" page="[[data.view]]">
             <!-- Views -->
             <iron-pages selected="[[data.view]]" attr-for-selected="name">
-                <fat-chat-overview name="overview" userid="[[userId]]"></fat-chat-overview>
-                <fat-chat-client name="chat"></fat-chat-client>
-                <fat-chat-screen name="screen" userid="[[userId]]" cid="[[subdata.cid]]"></fat-chat-screen>
+                <fat-chat-overview name="overview" user-id="[[userId]]"></fat-chat-overview>
+                <fat-chat-client name="chat" user-id="[[userId]]" user-name="[[userName]]"></fat-chat-client>
+                <fat-chat-screen name="screen" user-id="[[userId]]" user-name="[[userName]]" cid="[[subdata.cid]]"></fat-chat-screen>
             </iron-pages>
         </fat-chat-header>
 
@@ -42,9 +42,16 @@
 
         Polymer({
             is: 'fat-chat-ftw-app',
-            logger: function (obj) {
-                console.log(obj);
-            },
+            properties: {
+                userId: {
+                    type: String,
+                    notify: true
+                },
+                userName: {
+                    type: String,
+                    notify: true
+                }
+            },            
             ready: function () {
                 var pages = document.querySelector('iron-pages');
                 pages.select('overview');

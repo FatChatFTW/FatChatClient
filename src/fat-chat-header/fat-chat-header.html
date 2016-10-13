@@ -54,7 +54,7 @@
         <firebase-document
             app-name="fat-data"
             id="user"
-            path="/users2/{{userid}}"
+            path="/users2/{{userId}}"
             data="{{userData}}"
             disabled="true">
         </firebase-document>
@@ -67,12 +67,18 @@
             is: 'fat-chat-header',
             behaviors: [FAT],
             properties: {
-                userid: {
+                userId: {
                     type: String,
                     value: false,
                     notify: true,
                     reflectToAttribute: true
                 },
+                userName: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },                
                 userData: {
                     type: Object,
                     notify: false,
@@ -87,7 +93,7 @@
                 this.status = 'login';
                 this.userName = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getName();
                 this.googleProfileUrl = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getImageUrl();
-                this.userid = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getId();
+                this.userId = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getId();
                 this.$.user.disabled = false;
             },
             handleSignOut: function () {
@@ -95,7 +101,7 @@
                 this.status = 'logout';
                 this.userName = '';
                 this.googleProfileUrl = '';
-                this.userid = false;
+                this.userId = false;
             },
             _headerText: function (page) {
                 if (page === 'chat') {
@@ -115,7 +121,7 @@
                 this._createUser();
             },
             _createUser: function() {
-                FAT.storeValue(this.$.user, '/users2/', this.userid, {
+                FAT.storeValue(this.$.user, '/users2/', this.userId, {
                     name: this.userName
                 });
             }
