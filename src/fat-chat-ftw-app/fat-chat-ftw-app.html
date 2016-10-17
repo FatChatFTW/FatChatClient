@@ -25,13 +25,12 @@
         <app-route route="{{route}}" pattern="/:view" data="{{data}}" tail="{{subroute}}"></app-route>
         <app-route route="{{subroute}}" pattern="/:cid" data="{{subdata}}"></app-route>
 
-
         <!-- Navigation Test -->
         <fat-chat-header user-id="{{userId}}" user-name="{{userName}}" page="[[data.view]]">
             <!-- Views -->
             <iron-pages selected="[[data.view]]" attr-for-selected="name">
                 <fat-chat-overview name="overview" user-id="[[userId]]"></fat-chat-overview>
-                <fat-chat-client name="chat" user-id="[[userId]]" user-name="[[userName]]"></fat-chat-client>
+                <fat-chat-client name="chat" user-id="[[userId]]" user-name="[[userName]]" route="{{route}}"></fat-chat-client>
                 <fat-chat-screen name="screen" user-id="[[userId]]" user-name="[[userName]]" cid="[[subdata.cid]]"></fat-chat-screen>
             </iron-pages>
         </fat-chat-header>

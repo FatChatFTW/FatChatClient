@@ -2,7 +2,7 @@
   FAT = {
     properties: {
     },
-    storeValue: function(query, parent, key, value) {
+    createValue: function(query, parent, key, value) {
 		  query.save(parent, key).then(function() {
 			  query.setStoredValue(parent + key, value);
 		  });

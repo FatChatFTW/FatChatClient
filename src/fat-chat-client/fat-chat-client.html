@@ -39,9 +39,10 @@
         <firebase-document
             app-name="fat-data"
             id="conversations"
-            path="/users2/[[userId]]/conversations"
-            data="{{conversationData}}"
-            log="true">
+            path="/users2/[[userId]]"
+            data="{{userData}}"
+            log="true"
+            disabled="true">
         </firebase-document>
 
     </template>
@@ -54,17 +55,27 @@
             properties: {
                 userId: {
                     type: String,
-                    notify: true
+                    notify: true,
+                    observer: '_onChangeUserId' 
                 },
                 userName: {
                     type: String,
                     notify: true
                 },
-                conversationData: {
+                conversations: {
+                    type: Object,
+                    value: null,
+                    notify: true
+                },
+                userData: {
                     type: Object,
                     notify: true,
-                    observer: '_conversationDataChange'                    
+                    observer: '_onChangeUserData'                    
                 },
+                route: {
+                    type: Object,
+                    notify: true
+                }
             },
             initiateChat: function (e) {
                 var recipientId = e.model.user.$key;
@@ -72,36 +83,47 @@
                 this._createConversation(recipientId, recipientName);
             },
             _createConversation: function(recipientId, recipientName) {
+
+                var initialize = false;
                 
-                var conversations = this.conversationData.hasOwnProperty("conversations") 
-                    ? this.conversationData.conversations
-                    : {};
-                    
-                var conversation = conversations.hasOwnProperty(recipientId)
-                    ? conversations[recipientId]
-                    : {};
-                    
-                if (!conversation.hasOwnProperty("members")) {
-                    conversation.name = recipientName;
-                    conversation.messages = {};
-                    conversation.members = {};
-                    conversation.members[this.userId] = this._createMember(this.userName);
-                    conversation.members[recipientId] = this._createMember(recipientName);
-                    conversations[recipientId] = conversation; 
+                if (this.conversations == null) {
+                    this.conversations = {};
+                    initialize = true;
                 }
                 
-                FAT.updateValue(this.$.conversations, this.$.conversations.path, conversations);
+                if (!this.conversations.hasOwnProperty(recipientId)) {
+                    var conversation = {
+                        members: {},
+                        messages: {}
+                    }
+                    
+                    conversation.name = recipientName;
+                    conversation.members[this.userId] = this._createMember(this.userName);
+                    conversation.members[recipientId] = this._createMember(recipientName);
+                    this.conversations[recipientId] = conversation; 
+                    initialize = true;
+                }
+                
+                if (initialize) {
+                    FAT.createValue(this.$.conversations, this.$.conversations.path, '/conversations', this.conversations);
+                }
 
+                this.set('route.path', '/screen/' + recipientId);
             },            
             _createMember: function(memberName) {
                 return {
                     name: memberName
                 }
             },
-            _conversationDataChange: function() {
-                console.log("User id = " + this.userId);
-                console.log(this.$.conversations.path);
-                console.log(this.conversationData);
+            _onChangeUserId: function() {
+                this.$.conversations.disabled = !!this.userId;
+            },
+            _onChangeUserData: function(newValue, oldValue) {
+                if (!!newValue && newValue.hasOwnProperty('conversations')) {
+                    this.conversations = newValue.conversations;
+                    console.log('Conversations:');
+                    console.log(this.conversations);
+                }
             }            
         });
     </script>
