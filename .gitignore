@@ -1,4 +1,4 @@
 *.log
-bower_components
+# bower_components (include bower components for peeps who not haz access through da ing internet)
 .idea
 *.iml
