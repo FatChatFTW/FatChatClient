@@ -17,7 +17,7 @@
         </style>
 
         <div class="content">
-            <template is="dom-repeat" items="[[users]]" as="user">
+            <template is="dom-repeat" items="[[usersToChatWith]]" as="user">
                 <div class="user">
                     <paper-material>
                         <div class="container" tabindex="0">
@@ -67,6 +67,10 @@
                     value: null,
                     notify: true
                 },
+                usersToChatWith: {
+                    type: Array,
+                    computed: "computeUsersToChatWith(userId, users, conversations)"
+                },
                 userData: {
                     type: Object,
                     notify: true,
@@ -81,6 +85,43 @@
                 var recipientId = e.model.user.$key;
                 var recipientName = e.model.user.name;
                 this._createConversation(recipientId, recipientName);
+            },
+            computeUsersToChatWith: function (userId, users, conversations) {
+                if (userId == null || users == null) {
+                    return [];
+                }
+
+                // get all user ids from open conversations
+                var openChatUserIds = [];
+                if (conversations !== null && conversations) {
+                    for (var convKey in conversations) {
+                        for (var memberKey in conversations[convKey].members) {
+                            if (memberKey !== this.userId) {
+                                openChatUserIds.push(memberKey);
+                            }
+                        }
+                    }
+                }
+
+                // build list of users that you can start a new chat with, but excluding
+                // your own user and users that you're already chatting with
+                var usersToChatWith = [];
+                for (var userIndex in users) {
+                    var currentUser = users[userIndex];
+                    var yourSelf = (currentUser.$key === userId);
+                    var hasChatWith = openChatUserIds.indexOf(currentUser.$key) >= 0;
+                    if (!yourSelf && !hasChatWith) {
+                        usersToChatWith.push(currentUser);
+                    } else {
+                        console.debug('Excluding user ' + currentUser.name + ' from the New Chat list because ' +
+                                (yourSelf ?
+                                        "that's you!" :
+                                        "you're already chatting with this person!")
+                        );
+                    }
+                }
+
+                return usersToChatWith;
             },
             _createConversation: function(recipientId, recipientName) {
 
