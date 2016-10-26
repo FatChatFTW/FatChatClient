@@ -84,6 +84,11 @@
                     notify: false,
                     observer: '_userDataChange'
                 },
+                googleProfileUrl: {
+                    type: String,
+                    value: false,
+                    notify: true
+                },                
                 page: {
                     type: String,
                     notify: true
@@ -122,7 +127,8 @@
             },
             _createUser: function() {
                 FAT.storeValue(this.$.user, '/users2/', this.userId, {
-                    name: this.userName
+                    name: this.userName,
+                    image: this.googleProfileUrl
                 });
             }
         });

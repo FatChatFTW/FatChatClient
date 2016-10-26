@@ -14,14 +14,6 @@
                 display: block;
             }
         </style>
-
-        <firebase-query
-                app-name="fat-data"
-                id="query2"
-                path="/users2/[[userId]]/conversations/[[cid]]/messages"
-                data="{{messages}}"
-                order-by-child="time">
-        </firebase-query>
         
         <firebase-document
                 app-name="fat-data"
@@ -31,7 +23,7 @@
 
         <div class="content">
             <span>[[conversation.name]]</span>
-            <template is="dom-repeat" items="[[messages]]" as="message">
+            <template is="dom-repeat" items="[[conversation.messages]]" as="message" sort="_sortByTime">
                 <div class="message">
                     <paper-material>
                         <div class="container" tabindex="0">
@@ -45,7 +37,7 @@
                     <div class="container" tabindex="0">
                         <span><input user="[[userId]]" onchange="createMessage(this.value, this.user);this.value='';"/></span>
                     </div>
-                </paper-material>
+                </paper-material> 
             </div>
        </div>
 
@@ -60,6 +52,9 @@
             },
             logger: function (obj) {
                 console.log(obj);
+            },
+            _sortByTime: function(a, b) {
+                return b.time - a.time;
             }
         });
 
@@ -79,7 +74,10 @@
             msg.message = message;
             msg.sender = userId;
             msg.time = Date.now();
+            var timestamp = Date.now();
+            
             document.querySelector('#query2').setStoredValue(document.querySelector('#query2').path + '/' + guid(), msg);
+            this.set('conversation.timestamp', timestamp);
         }
 
     </script>

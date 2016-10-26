@@ -21,6 +21,7 @@
                 <div class="user">
                     <paper-material>
                         <div class="container" tabindex="0">
+                            <img src="[[user.image]]" style="width:36px;height:36px;border-radius:50%;">
                             <span>[[user.name]]</span>
                             <paper-button raised noink on-tap="initiateChat">Chat</paper-button>
                         </div>
@@ -69,9 +70,10 @@
             initiateChat: function (e) {
                 var recipientId = e.model.user.$key;
                 var recipientName = e.model.user.name;
-                this._createConversation(recipientId, recipientName);
+                var recipientImage = e.model.user.image;
+                this._createConversation(recipientId, recipientName, recipientImage);
             },
-            _createConversation: function(recipientId, recipientName) {
+            _createConversation: function(recipientId, recipientName, recipientImage) {
                 
                 var conversations = this.conversationData.hasOwnProperty("conversations") 
                     ? this.conversationData.conversations
@@ -83,15 +85,19 @@
                     
                 if (!conversation.hasOwnProperty("members")) {
                     conversation.name = recipientName;
+                    conversation.image = recipientImage;
+                    var d = new Date();
+                    var n = d.getTime(); 
+                    conversation.timestamp = n;
+                    
                     conversation.messages = {};
                     conversation.members = {};
                     conversation.members[this.userId] = this._createMember(this.userName);
                     conversation.members[recipientId] = this._createMember(recipientName);
-                    conversations[recipientId] = conversation; 
+                    conversations[recipientId] = conversation;
                 }
                 
                 FAT.updateValue(this.$.conversations, this.$.conversations.path, conversations);
-
             },            
             _createMember: function(memberName) {
                 return {

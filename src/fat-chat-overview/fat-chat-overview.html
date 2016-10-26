@@ -26,24 +26,27 @@
                 --paper-badge-margin-left: 20px;
                 --paper-badge-margin-bottom: 0px;
             }
-
-
         </style>
 
         <firebase-query
                 app-name="fat-data"
                 id="conversationsQuery"
                 path="/users2/[[userId]]/conversations"
+                order-by-child="timestamp"
                 data="{{conversations}}">
         </firebase-query>
 
-
         <div class="content">
-            <template is="dom-repeat" items="[[conversations]]" as="conversation">
+            <template is="dom-repeat" items="[[conversations]]" as="conversation" sort="_sortByTimestamp">
                 <div class="chat-unread-[[chat.unread]]">
                     <paper-material>
-                        <div class="container" tabindex="0">
-                            <span><a href="#/screen/[[conversation.$key]]">[[conversation.name]]</a></span>
+                        <div class="container" tabindex="0" style="display: inline-block;vertical-align: middle;line-height: normal; ">
+                            <span>
+                                <a href="#/screen/[[conversation.$key]]" style="color: #000000; text-decoration: none;">
+                                    <img src="[[conversation.image]]" style="width:36px;height:36px;border-radius:50%;">
+                                    [[conversation.name]]<br>Timestamp: [[conversation.timestamp]]
+                                </a>
+                            </span>
                             <paper-badge label="0"></paper-badge>
                         </div>
                     </paper-material>
@@ -57,7 +60,12 @@
 
         Polymer({
             is: 'fat-chat-overview',
-            properties: {}
+            properties: {},
+            _sortByTimestamp: function(a, b) {
+                return b.timestamp - a.timestamp;
+            }
         });
+        
     </script>
+    
 </dom-module>
