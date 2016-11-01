@@ -41,7 +41,6 @@
             id="conversations"
             path="/users2/[[userId]]"
             data="{{userData}}"
-            log="true"
             disabled="true">
         </firebase-document>
 
@@ -147,6 +146,7 @@
                 
                 if (initialize) {
                     FAT.createValue(this.$.conversations, this.$.conversations.path, '/conversations', this.conversations);
+                    FAT.createValue(this.$.conversations, '/users2/' + recipientId + '/conversations', '/' + this.userId, this.conversations[recipientId]);
                 }
 
                 this.set('route.path', '/screen/' + recipientId);

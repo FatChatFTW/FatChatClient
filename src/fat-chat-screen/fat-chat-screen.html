@@ -43,7 +43,7 @@
             <div class="message">
                 <paper-material>
                     <div class="container" tabindex="0">
-                        <span><input user="[[userId]]" onchange="createMessage(this.value, this.user);this.value='';"/></span>
+                        <span><input on-change="createMessage"/></span>
                     </div>
                 </paper-material>
             </div>
@@ -56,31 +56,34 @@
         Polymer({
             is: 'fat-chat-screen',
             properties: {
-                cid: String
+                cid: String,
+                notify: true
             },
-            logger: function (obj) {
-                console.log(obj);
-            }
-        });
+            createMessage: function(e) {
+                var message = e.target.value;
+                e.target.value = '';
 
-        function guid() {
-            function s4() {
+                var msg = {};
+                msg.message = message;
+                msg.sender = this.userId;
+                msg.time = Date.now();
+
+                var guid = this.guid();
+                
+                document.querySelector('#query2').setStoredValue(document.querySelector('#query2').path + '/' + guid, msg);
+                document.querySelector('#query2').setStoredValue('/users2/' + this.cid + '/conversations/' + this.userId + '/messages/'+ guid, msg);
+            },
+            guid: function() {
+                return this.s4() + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' +
+                    this.s4() + '-' + this.s4() + this.s4() + this.s4();
+            },
+            s4: function() {
                 return Math.floor((1 + Math.random()) * 0x10000)
                         .toString(16)
                         .substring(1);
             }
-
-            return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-                    s4() + '-' + s4() + s4() + s4();
-        }
-
-        function createMessage(message, userId) {
-            var msg = {};
-            msg.message = message;
-            msg.sender = userId;
-            msg.time = Date.now();
-            document.querySelector('#query2').setStoredValue(document.querySelector('#query2').path + '/' + guid(), msg);
-        }
-
+            
+            
+        });
     </script>
 </dom-module>
