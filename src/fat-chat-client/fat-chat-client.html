@@ -21,6 +21,7 @@
                 <div class="user">
                     <paper-material>
                         <div class="container" tabindex="0">
+                            <img src="[[user.image]]" style="width:36px;height:36px;border-radius:50%;">
                             <span>[[user.name]]</span>
                             <paper-button raised noink on-tap="initiateChat">Chat</paper-button>
                         </div>
@@ -55,7 +56,7 @@
                 userId: {
                     type: String,
                     notify: true,
-                    observer: '_onChangeUserId' 
+                    observer: '_onChangeUserId'
                 },
                 userName: {
                     type: String,
@@ -73,7 +74,7 @@
                 userData: {
                     type: Object,
                     notify: true,
-                    observer: '_onChangeUserData'                    
+                    observer: '_onChangeUserData'
                 },
                 route: {
                     type: Object,
@@ -83,7 +84,8 @@
             initiateChat: function (e) {
                 var recipientId = e.model.user.$key;
                 var recipientName = e.model.user.name;
-                this._createConversation(recipientId, recipientName);
+                var recipientImage = e.model.user.image;
+                this._createConversation(recipientId, recipientName, recipientImage);
             },
             computeUsersToChatWith: function (userId, users, conversations) {
                 if (userId == null || users == null) {
@@ -122,7 +124,7 @@
 
                 return usersToChatWith;
             },
-            _createConversation: function(recipientId, recipientName) {
+            _createConversation: function(recipientId, recipientName, recipientImage) {
 
                 var initialize = false;
                 
@@ -130,17 +132,21 @@
                     this.conversations = {};
                     initialize = true;
                 }
-                
+
                 if (!this.conversations.hasOwnProperty(recipientId)) {
                     var conversation = {
                         members: {},
                         messages: {}
                     }
-                    
+
+                    var d = new Date();
+                    var n = d.getTime();
+                    conversation.timestamp = n;
                     conversation.name = recipientName;
+                    conversation.image = recipientImage;
                     conversation.members[this.userId] = this._createMember(this.userName);
                     conversation.members[recipientId] = this._createMember(recipientName);
-                    this.conversations[recipientId] = conversation; 
+                    this.conversations[recipientId] = conversation;
                     initialize = true;
                 }
                 

@@ -14,14 +14,6 @@
                 display: block;
             }
         </style>
-
-        <firebase-query
-                app-name="fat-data"
-                id="query2"
-                path="/users2/[[userId]]/conversations/[[cid]]/messages"
-                data="{{messages}}"
-                order-by-child="time">
-        </firebase-query>
         
         <firebase-document
                 app-name="fat-data"
@@ -31,7 +23,7 @@
 
         <div class="content">
             <span>[[conversation.name]]</span>
-            <template is="dom-repeat" items="[[messages]]" as="message">
+            <template is="dom-repeat" items="[[conversation.messages]]" as="message" sort="_sortByTime">
                 <div class="message">
                     <paper-material>
                         <div class="container" tabindex="0">
@@ -59,19 +51,26 @@
                 cid: String,
                 notify: true
             },
+            _sortByTime: function(a, b) {
+                return b.time - a.time;
+            },
             createMessage: function(e) {
                 var message = e.target.value;
                 e.target.value = '';
 
+                var timestamp = Date.now();
+
                 var msg = {};
                 msg.message = message;
                 msg.sender = this.userId;
-                msg.time = Date.now();
+                msg.time = timestamp;
 
                 var guid = this.guid();
-                
+
                 document.querySelector('#query2').setStoredValue(document.querySelector('#query2').path + '/' + guid, msg);
                 document.querySelector('#query2').setStoredValue('/users2/' + this.cid + '/conversations/' + this.userId + '/messages/'+ guid, msg);
+
+                this.set('conversation.timestamp', timestamp);
             },
             guid: function() {
                 return this.s4() + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' +
@@ -82,8 +81,6 @@
                         .toString(16)
                         .substring(1);
             }
-            
-            
         });
     </script>
 </dom-module>
