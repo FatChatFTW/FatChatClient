@@ -126,7 +126,7 @@
                 this._createUser();
             },
             _createUser: function() {
-                FAT.storeValue(this.$.user, '/users2/', this.userId, {
+                FAT.createValue(this.$.user, '/users2/', this.userId, {
                     name: this.userName,
                     image: this.googleProfileUrl
                 });
