@@ -1,0 +1,112 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/google-signin/google-signin.html">
+<link rel="import" href="../../../bower_components/google-signin/google-signin-aware.html">
+<link rel="import" href="../../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-scroll-header-panel/paper-scroll-header-panel.html">
+
+<link rel="import" href="../../behaviors/fat-behavior.html">
+<link rel="import" href="../fat-overview-item/fat-overview-item.html"/>
+
+
+<dom-module id="fat-overview">
+    
+    <template>
+        
+        <style include="shared-styles"></style>
+        <style is="custom-style">
+            :host {
+                overflow: auto;
+            }
+        </style>
+
+        <!-- Database -->
+        <firebase-query
+                app-name="fat-data"
+                id="conversationsQuery"
+                path="/users2/[[userId]]/conversations"
+                order-by-child="lastTimestamp"
+                data="{{conversations}}">
+        </firebase-query>
+
+        <!-- Chat history -->
+        <template id="conversationsTemplate" is="dom-repeat" items="{{conversations}}" as="conversation" sort="_sortByTimestamp">
+            <fat-overview-item 
+                user-id="{{conversation.key}}" 
+                user-name="{{conversation.name}}" 
+                user-avatar="{{conversation.avatar}}" 
+                last-timestamp="{{conversation.lastTimestamp}}" 
+                last-message="{{conversation.lastMessage}}" 
+                message-count="{{conversation.messageCount}}"
+                current-chat-id="{{currentChatId}}"
+                current-chat-name="{{currentChatName}}" 
+                current-chat-avatar="{{currentChatAvatar}}" 
+                current-chat-id="{{currentChatId}}"
+                on-tap="selectChat">
+            </fat-overview-item>
+        </template>
+        
+    </template>
+
+    <script>
+        Polymer({
+            is: 'fat-overview',
+            behaviors: [FAT],
+            properties: {
+                userId: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                currentChatId: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                currentChatName: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                currentChatAvatar: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                conversations: {
+                    type: Object,
+                    notify: true,
+                    observer: '_sortConversations'
+                },
+                messageCount: {
+                    type: Number,
+                    notify: true
+                }
+            },
+            selectChat: function (e) {
+                this.currentChatName = e.model.conversation.name;
+                this.currentChatAvatar = e.model.conversation.avatar;
+                this.currentChatId = e.model.conversation.$key;
+            },
+            _sortConversations: function() {
+                console.log("Rerender conversations");
+                // this.$.conversationsTemplate.render();  
+            },
+            _sortByTimestamp: function(a, b) {
+                return b.lastTimestamp - a.lastTimestamp;
+            }
+        });
+    </script>
+</dom-module>

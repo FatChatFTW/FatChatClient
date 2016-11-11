@@ -1,0 +1,190 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/google-signin/google-signin.html">
+<link rel="import" href="../../../bower_components/google-signin/google-signin-aware.html">
+
+<link rel="import" href="../../../bower_components/app-layout/app-box/app-box.html">
+<link rel="import" href="../../../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../bower_components/app-route/app-location.html">
+
+<link rel="import" href="../../../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../../bower_components/paper-badge/paper-badge.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+
+<link rel="import" href="../../fat-chat-shared-styles/fat-chat-shared-styles.html"/>
+<link rel="import" href="../fat-me/fat-me.html"/>
+
+<dom-module id="fat-login">
+    <template>
+        <style include="shared-styles"></style>
+        <style is="custom-style">
+            :host {
+                display: block;
+                font-family: Helvetica, Arial, sans-serif;
+            }
+            
+            app-box {
+                position: fixed;
+                left: 150px;
+                right: 150px;
+                top: 20px;
+                bottom: 20px;
+                overflow-y: auto;
+                background-color: #f3f3f3;
+                border: 1px solid #ccc;
+                width: auto;
+                height: auto;
+                box-shadow: 1px 3px 5px rgba(0, 0, 0, 0.3);
+            }
+            
+            app-drawer {
+                position: absolute;
+                bottom: 0px;
+                --app-drawer-width: 300px;
+                --app-drawer-content-container: {
+                    background: #aaa;
+                    box-shadow: 1px 0 2px 1px rgba(0,0,0,0.18);
+                }
+                --app-drawer-scrim-background: #ececec;
+            }
+
+
+            iron-icon {
+                width: 100px;
+                height: 100px;
+            }
+
+            google-signin {
+                margin-top: 40px;
+            }            
+            
+            .white {
+                height: 200px;
+                line-height: 200px;
+                text-align: center;
+                background: white;
+                color: orange;
+            }
+            
+            .orange {
+                position: absolute;
+                top: 200px;
+                bottom: 0px;
+                left: 0px;
+                right: 0px;
+                color: white;
+                padding: 40px;
+                background: orange;
+                color: white;
+                text-align: center;
+            }
+
+        </style>
+
+        <!-- Database -->
+        <firebase-document
+            app-name="fat-data"
+            id="user"
+            path="/users2/{{userId}}"
+            data="{{userData}}"
+            disabled="true">
+        </firebase-document>
+        
+        <div class="white">
+            <iron-icon icon="icons:account-circle"></iron-icon>
+        </div>
+
+        <div class="orange">
+            <h1>Welcome</h1>
+            <p>Sign in with your Google account to continue.</p>
+    
+            <google-signin 
+                client-id="44236737009-ov2f3aq0qjfrqpf6bocr3c95pgjv8ak1.apps.googleusercontent.com"
+                signed-in="{{signedIn}}">
+            </google-signin>
+                        
+            <google-signin-aware
+                client-id="44236737009-ov2f3aq0qjfrqpf6bocr3c95pgjv8ak1.apps.googleusercontent.com"
+                signed-in="{{signedIn}}"
+                is-authorized="{{isAuthorized}}" 
+                on-google-signin-aware-success="handleSignIn"
+                on-google-signin-aware-signed-out="handleSignOut">
+            </google-signin-aware>
+        </div>
+    </template>
+
+    <script>
+
+        Polymer({
+            is: 'fat-login',
+            behaviors: [FAT],            
+            properties: {
+                userId: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                userName: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },                
+                userAvatar: {
+                    type: String,
+                    value: false,
+                    notify: true
+                },
+                isReady: {
+                    type: Boolean,
+                    value: false,
+                    notify: true
+                },                
+                userData: {
+                    type: Object,
+                    notify: false,
+                    observer: '_userDataChange'
+                }
+            },
+            handleSignIn: function () {
+                this.status = 'login';
+                this.userId = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getId();
+                this.userName = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getName();
+                this.userAvatar = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getImageUrl();
+                this.$.user.disabled = false;
+                this.isReady = true;               
+                this.is = true;               
+            },
+            handleSignOut: function () {
+                this.$.user.disabled = true;                
+                this.status = 'logout';
+                this.userId = false;
+                this.userName = '';
+                this.userAvatar = '';
+                this.isReady = true;                
+            },
+            _userDataChange: function() {
+                
+                if (this.$.user.disabled) return;
+                if (this.userData.hasOwnProperty("name")) return;
+
+                console.log('User not found, create new user!');
+                this._createUser();
+            },
+            _createUser: function() {
+                FAT.createValue(this.$.user, '/users2/', this.userId, {
+                    name: this.userName,
+                    avatar: this.userAvatar
+                });
+            }
+        });
+    </script>
+    
+</dom-module>

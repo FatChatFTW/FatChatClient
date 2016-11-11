@@ -9,7 +9,7 @@
 <dom-module id="fat-chat-screen">
     <template>
         <style include="shared-styles"/>
-        <style>
+        <style is="custom-style">
             :host {
                 display: block;
             }
@@ -51,7 +51,7 @@
                 cid: String,
                 notify: true
             },
-            _sortByTime: function(a, b) {
+            _sortByTime: function(a, b) {
                 return b.time - a.time;
             },
             createMessage: function(e) {

@@ -9,6 +9,15 @@
     },
     updateValue: function(query, path, value) {
 		  query.setStoredValue(path, value);
-    }
+    },
+    shortTime: function (lastTimestamp) {
+      if (!lastTimestamp) return '';
+      var d = new Date(lastTimestamp);
+      return this._twoDigit(d.getMonth()+1) + '/' + d.getFullYear().toString().substr(2,2) + ' ' + 
+            this._twoDigit(d.getHours()) + ':' + this._twoDigit(d.getMinutes());
+    },
+    _twoDigit: function (n) {
+      return n > 9 ? '' + n: '0' + n;
+    }    
   };
 </script>

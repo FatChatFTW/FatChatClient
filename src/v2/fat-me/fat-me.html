@@ -1,0 +1,120 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/google-signin/google-signin.html">
+<link rel="import" href="../../../bower_components/google-signin/google-signin-aware.html">
+<link rel="import" href="../../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-scroll-header-panel/paper-scroll-header-panel.html">
+<link rel="import" href="../../behaviors/fat-behavior.html">
+
+<dom-module id="fat-me">
+    
+    <template>
+        
+        <style is="custom-style">
+            :host {
+                color: white;
+            }
+            
+            :host::shadow #button.google-signin {
+                border: none !important;
+                background-color: transparent !important;
+            }
+            
+            app-toolbar {
+                background: orange;
+                border-bottom: 1px solid #eee;
+                --app-toolbar-font-size: 18px;
+            }      
+            
+            app-toolbar img {
+                border-radius: 22px;
+                width: 44px;
+                margin-right: 10px;
+            }
+        </style>
+
+        <template is="dom-if" if="{{userAvatar}}">
+            <app-toolbar>
+                <img class="header-image-avatar" src="[[userAvatar]]"/>
+                <div main-title>{{userName}}</div>
+                
+                <!-- Add new chat -->
+                <template is="dom-if" if="{{!isAddChat}}">
+                    <paper-icon-button icon="add-circle" title="Start new chat" on-click="handleAddChat"></paper-icon-button>
+                </template>
+                
+                <!-- Close participant list -->
+                <template is="dom-if" if="{{isAddChat}}">
+                    <paper-icon-button icon="cancel" title="Close user list" on-click="handleAddChat"></paper-icon-button>
+                </template>
+                
+                <google-signin client-id="44236737009-ov2f3aq0qjfrqpf6bocr3c95pgjv8ak1.apps.googleusercontent.com"
+                    id="signout"
+                    signed-in="{{signedIn}}"
+                    width="iconOnly"
+                    brand="icons:exit-to-app"
+                    title="Sign out"
+                    fill="true">
+                </google-signin>
+                
+                <google-signin-aware
+                    client-id="44236737009-ov2f3aq0qjfrqpf6bocr3c95pgjv8ak1.apps.googleusercontent.com"
+                    signed-in="{{signedIn}}"
+                    is-authorized="{{isAuthorized}}" 
+                    on-google-signin-aware-success="handleSignIn"
+                    on-google-signin-aware-signed-out="handleSignOut">
+                </google-signin-aware>
+                            
+            </app-toolbar>            
+        </template>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'fat-me',
+            behaviors: [FAT],
+            properties: {
+                userId: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                userName: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },                
+                userAvatar: {
+                    type: String,
+                    value: false,
+                    notify: true
+                },
+                isAddChat: {
+                    type: Boolean,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                }
+            },
+            handleAddChat: function() {
+                this.isAddChat = !this.isAddChat
+            },
+            handleSignOut: function () {
+                this.userId = false;
+                this.userName = '';
+                this.userAvatar = '';
+            }
+        });
+    </script>
+</dom-module>

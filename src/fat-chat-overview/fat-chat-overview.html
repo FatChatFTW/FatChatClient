@@ -14,6 +14,7 @@
 
 <dom-module id="fat-chat-overview">
     <template>
+
         <style include="shared-styles"/>
         <style is="custom-style">
             :host {
@@ -28,6 +29,7 @@
             }
         </style>
 
+        <!-- Database -->
         <firebase-query
                 app-name="fat-data"
                 id="conversationsQuery"
@@ -36,36 +38,22 @@
                 data="{{conversations}}">
         </firebase-query>
 
+        <!-- Conversation overview -->
         <div class="content">
-            <template is="dom-repeat" items="[[conversations]]" as="conversation" sort="_sortByTimestamp">
-                <div class="chat-unread-[[chat.unread]]">
-                    <paper-material>
-                        <div class="container" tabindex="0" style="display: inline-block;vertical-align: middle;line-height: normal; ">
-                            <span>
-                                <a href="#/screen/[[conversation.$key]]" style="color: #000000; text-decoration: none;">
-                                    <img src="[[conversation.image]]" style="width:36px;height:36px;border-radius:50%;">
-                                    [[conversation.name]]<br>Timestamp: [[conversation.timestamp]]
-                                </a>
-                            </span>
-                            <paper-badge label="0"></paper-badge>
-                        </div>
-                    </paper-material>
-                </div>
+            <template is="dom-repeat" items="{{conversations}}" as="conversation" sort="_sortByTimestamp">
+                <fat-overview-item conversation="{{conversation}}"></fat-overview-item>                
             </template>
         </div>
 
     </template>
 
     <script>
-
         Polymer({
             is: 'fat-chat-overview',
             properties: {},
-            _sortByTimestamp: function(a, b) {
+            _sortByTimestamp: function(a, b) {
                 return b.timestamp - a.timestamp;
             }
         });
-        
     </script>
-    
 </dom-module>

@@ -1,0 +1,321 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/google-signin/google-signin.html">
+<link rel="import" href="../../../bower_components/google-signin/google-signin-aware.html">
+<link rel="import" href="../../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-scroll-header-panel/paper-scroll-header-panel.html">
+
+<link rel="import" href="../../behaviors/fat-behavior.html">
+
+
+<dom-module id="fat-chat">
+    
+    <template>
+        
+        <style include="shared-styles"></style>
+        <style is="custom-style">
+            :host {
+                position: relative;
+                overflow: hidden;
+            }
+
+            app-toolbar {
+                left: 1px;
+                background: #aaa;
+                border-bottom: 1px solid #ccc;
+                box-shadow: 1px 0 2px 1px rgba(0,0,0,0.18);
+                --app-toolbar-font-size: 18px;
+            }      
+            
+            app-toolbar img {
+                border-radius: 22px;
+                width: 44px;
+                margin-right: 10px;
+            }
+            
+            paper-material.message {
+                font-size: 14px;
+                color: black;
+                margin: 14px;
+                width: 60%;
+            }
+
+            paper-material.message.me {
+                float: right;
+            }
+
+            paper-material.message .time {
+                float: right;
+                font-size: 12px;
+                color: #888;
+            }
+
+            paper-material.message .name {
+                color: #B87700;
+                font-weight: bold;
+            }
+
+            paper-material.message.me .name {
+                color: orange;
+            }
+
+            paper-material.message .body {
+                margin-top: 8px;
+            }
+
+            paper-material.message-input {
+                position: absolute;
+                bottom: 0px;
+                left: 0px;
+                right: 0px;
+                height: 60px;
+                box-shadow: none;
+            }
+            
+            input {
+                border: none;
+                width: 100%;
+                height: 25px;
+                line-height: 30px;
+                font-size: 14px;
+                outline: none;
+            }
+            
+            .messages {
+                position: absolute;
+                top: 66px;
+                bottom: 76px;
+                left: 2px;
+                right: 0px;
+                overflow: auto;
+                box-shadow: inset 0 0 5px rgba(0,0,0,0.18);
+                border-bottom: 1px solid #bbb;
+                background-color: #ececec;
+            }
+            
+            .message-row {
+                overflow: auto;
+            }
+        </style>
+
+        <firebase-query
+            id="messagesQuery"
+            app-name="fat-data"
+            path="/users2/[[userId]]/conversations/[[currentChatId]]/messages"
+            data="{{messages}}">
+        </firebase-query>
+        
+        <firebase-document
+            id="chatQuery"
+            app-name="fat-data"
+            path="/users2/[[userId]]/conversations/[[currentChatId]]"
+            data="{{conversation}}"
+            disabled="true">
+        </firebase-document>
+
+        <firebase-document
+            id="recipientQuery"
+            app-name="fat-data"
+            path="/users2/[[currentChatId]]/conversations/[[userId]]"
+            data="{{recipientConversation}}"
+            disabled="true">
+        </firebase-document>
+        
+        <app-toolbar>
+            <img class="header-image-avatar" src="{{currentChatAvatar}}"/>
+            <div main-title>{{currentChatName}}</div>
+        </app-toolbar>            
+
+        <div id="messageContainer" class="messages">
+            <template id="messageTemplate" is="dom-repeat" items="{{messages}}" as="message" sort="_sortByTime">
+                <div class="message-row">
+                    <paper-material class$="message {{isMe(message.sender)}}">
+                        <span class="time">[[shortTime(message.time)]]</span>
+                        <div class="name">[[message.name]]</div>
+                        <div class="body">[[message.message]]</div>
+                    </paper-material>
+                </div>
+            </template>
+        </div>
+        
+        <paper-material class="message-input">
+            <input id="messageInput" on-change="createMessage" tabindex="0" placeholder="message ..."/>
+        </paper-material>
+        
+    </template>
+
+    <script>
+        Polymer({
+            is: 'fat-chat',
+            behaviors: [FAT],
+            properties: {
+                userId: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true,
+                    observer: '_onChangeUserId'   
+                },
+                userName: {
+                    type: String,
+                    value: false,
+                    notify: true
+                },
+                currentChatId: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true,
+                    observer: '_onChangeUserId'   
+                },
+                currentChatName: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                currentChatAvatar: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                conversation: {
+                    type: Object,
+                    notify: true,
+                    observer: '_onChangeChat'   
+                },
+                recipientConversation: {
+                    type: Object,
+                    notify: true,
+                    observer: '_onChangeRecipient'   
+                },
+                messages: {
+                    type: Array,
+                    notify: true                     
+                }                
+            },
+            ready: function() {
+                this.$.messageTemplate.addEventListener("dom-change", function(event) {
+                    var el = document.getElementById("messageContainer");
+                    el.scrollTop = el.scrollHeight;
+                });
+            },
+            attached: function() {
+                document.getElementById("messageInput").focus();
+            },
+            isMe: function(sender) {
+                return sender === this.userId ? "me" : "";
+            },
+            shortTime: function (lastTimestamp) {
+                return FAT.shortTime(lastTimestamp);
+            },
+            createMessage: function(e) {
+                var messages = this.conversation.hasOwnProperty('messages')
+                    ? this.conversation.messages
+                    : [];
+
+                var recipientMessages = this.recipientConversation.hasOwnProperty('messages')
+                    ? this.recipientConversation.messages
+                    : [];
+                    
+                var message = e.target.value;
+                var timestamp = Date.now();
+                var guid = this.guid();
+                var msg = {};
+
+                e.target.value = '';
+
+                msg.sender = this.userId;
+                msg.name = this.userName;
+                msg.time = timestamp;
+                msg.message = message;
+                
+                messages[guid] = msg;
+                recipientMessages[guid] = msg;
+                
+                this.conversation.messages = messages;
+                this.conversation.lastTimestamp = timestamp;
+                this.conversation.lastMessage = message;
+                this.conversation.messageCount = 0; 
+                
+                this.recipientConversation.messages = recipientMessages;
+                this.recipientConversation.lastTimestamp = timestamp;
+                this.recipientConversation.lastMessage = message;
+                if (!this.recipientConversation.hasOwnProperty('messageCount')) {
+                    this.recipientConversation.messageCount = 0;                    
+                }
+                this.recipientConversation.messageCount++;
+                
+                // console.log("--- create message ---");
+                // console.log("ME:");
+                // console.log(this.$.chatQuery.path);
+                // console.log(this.conversation.name);
+                // console.log("RECIPIENT:");
+                // console.log(this.$.recipientQuery.path);
+                // console.log(this.recipientConversation.name);
+                
+                FAT.updateValue(this.$.chatQuery, this.$.chatQuery.path, this.conversation);
+                FAT.updateValue(this.$.recipientQuery, this.$.recipientQuery.path, this.recipientConversation);
+
+            },
+            guid: function() {
+                return this.s4() + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' +
+                    this.s4() + '-' + this.s4() + this.s4() + this.s4();
+            },
+            s4: function() {
+                return Math.floor((1 + Math.random()) * 0x10000)
+                        .toString(16)
+                        .substring(1);
+            },
+            _sortByTime: function(a, b) {
+                return a.time - b.time;
+            },
+            _onChangeUserId: function() {
+                // Obscure code warning.  Firebase documents return weird results
+                // during the polymer init lifecycle. So keep them disabled until
+                // we resolved the variables that we want to query on. Furthermore,
+                // if you ever need to change the path of a Firebase document or 
+                // query then it is not enough to just change the variable. It is
+                // better to set the path to null first and then specify the full
+                // (new) path. This clears the cache properly. In the future
+                // this problem will hopefully be solved.
+                
+                var idsValid = !!this.userId && !!this.currentChatId;
+                this.$.chatQuery.disabled = idsValid;
+                this.$.recipientQuery.disabled = idsValid;
+                
+                // console.log("Change chat id valid = " + idsValid);
+                
+                if (idsValid) {
+                    this.$.chatQuery.disabled = true;
+                    this.$.chatQuery.path = null;
+                    this.$.chatQuery.path = '/users2/' + this.userId + '/conversations/' + this.currentChatId;
+                    this.$.chatQuery.disabled = false;
+                    this.$.recipientQuery.path = null;
+                    this.$.recipientQuery.path = '/users2/' + this.currentChatId + '/conversations/' + this.userId;
+                    this.$.messagesQuery.path = null;
+                    this.$.messagesQuery.path = '/users2/' + this.userId + '/conversations/' + this.currentChatId + '/messages';
+                }
+            },
+            _onChangeChat: function() {
+                    // console.log("--- update chat ---");
+                    // console.log(this.$.chatQuery.path);
+                    // console.log("I am chatting with: " + this.conversation.name);
+            },
+            _onChangeRecipient: function() {
+                    // console.log("--- update recipient ---");
+                    // console.log(this.$.recipientQuery.path);
+                    // console.log("Recipient chat with (me): " + this.recipientConversation.name);            
+            }
+        });
+    </script>
+</dom-module>

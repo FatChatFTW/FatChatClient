@@ -79,6 +79,12 @@
                     notify: true,
                     reflectToAttribute: true
                 },                
+                userAvatar: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },                
                 userData: {
                     type: Object,
                     notify: false,
@@ -95,27 +101,18 @@
                 }
             },
             handleSignIn: function () {
-                this.status = 'login';
-                this.userName = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getName();
-                this.googleProfileUrl = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getImageUrl();
                 this.userId = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getId();
+                this.userName = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getName();
+                this.userAvatar = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getImageUrl();
                 this.$.user.disabled = false;
+                this.status = 'login';
             },
             handleSignOut: function () {
                 this.$.user.disabled = true;                
-                this.status = 'logout';
-                this.userName = '';
-                this.googleProfileUrl = '';
                 this.userId = false;
-            },
-            _headerText: function (page) {
-                if (page === 'chat') {
-                    return 'Start new chat';
-                } else if (page === 'overview') {
-                    return 'Overview of existing chats';
-                } else {
-                    return 'Current chat';
-                }
+                this.userName = '';
+                this.userAvatar = '';
+                this.status = 'logout';
             },
             _userDataChange: function() {
                 
@@ -128,7 +125,7 @@
             _createUser: function() {
                 FAT.createValue(this.$.user, '/users2/', this.userId, {
                     name: this.userName,
-                    image: this.googleProfileUrl
+                    avatar: this.avatar
                 });
             }
         });

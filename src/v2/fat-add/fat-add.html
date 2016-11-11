@@ -1,0 +1,253 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/google-signin/google-signin.html">
+<link rel="import" href="../../../bower_components/google-signin/google-signin-aware.html">
+<link rel="import" href="../../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-scroll-header-panel/paper-scroll-header-panel.html">
+
+<link rel="import" href="../../behaviors/fat-behavior.html">
+<link rel="import" href="../fat-add-item/fat-add-item.html"/>
+
+
+<dom-module id="fat-add">
+    
+    <template>
+        
+        <style include="shared-styles"></style>
+        <style is="custom-style">
+            :host {
+                overflow: auto;
+            }
+        </style>
+
+        <!-- Database -->
+        <firebase-document
+            app-name="fat-data"
+            id="conversationsQuery"
+            path="/users2/[[userId]]"
+            data="{{user}}"
+            disabled="true">
+        </firebase-document>
+        
+        <firebase-query
+            app-name="fat-data"
+            id="usersQuery"
+            path="/users2"
+            order-by-child="name"
+            data="{{users}}">
+        </firebase-query>
+
+        <!-- Chat history -->
+        <template is="dom-repeat" items="{{users}}" as="user">
+            <fat-add-item 
+                user-id="{{user.key}}" 
+                user-name="{{user.name}}" 
+                user-avatar="{{user.avatar}}" 
+                on-tap="addChat">
+            </fat-add-item>
+        </template>
+        
+    </template>
+
+    <script>
+        Polymer({
+            is: 'fat-add',
+            behaviors: [FAT],
+            properties: {
+                userId: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true,
+                    observer: '_onChangeUserId'                    
+                },
+                userName: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },                
+                userAvatar: {
+                    type: String,
+                    value: false,
+                    notify: true
+                },                
+                currentChatId: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                currentChatName: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                currentChatAvatar: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                user: {
+                    type: Object,
+                    notify: true,
+                    observer: '_onChangeUser'
+                },                 
+                users: {
+                    type: Object,
+                    notify: true,
+                    observer: '_onChangeUsers'
+                },    
+                conversations: {
+                    type: Object,
+                    value: null,
+                    notify: true
+                },
+                addUserList: {
+                    type: Array,
+                    value: null,
+                    notify: true
+                },     
+                isAddChat: {
+                    type: Boolean,
+                    value: false,
+                    notify: true
+                }                  
+            },
+            addChat: function (e) {
+                var recipientId = e.model.user.$key;
+                var recipientName = e.model.user.name;
+                
+                var recipientAvatar = e.model.user.avatar !== undefined 
+                    ? e.model.user.avatar
+                    : '';
+                    
+                this._createConversation(recipientId, recipientName, recipientAvatar);
+            },
+            _createConversation: function(recipientId, recipientName, recipientAvatar) {
+
+                var initialize = false;
+                var recipientConversation = false;
+                
+                if (this.conversations == null) {
+                    this.conversations = {};
+                    initialize = true;
+                }
+
+                if (!this.conversations.hasOwnProperty(recipientId)) {
+                    var d = new Date();
+                    var n = d.getTime();
+
+                    var conversation = {
+                        members: {},
+                        messages: {}
+                    }
+                    
+                    var recipientConversation = {
+                        members: {},
+                        messages: {}
+                    }
+
+                    conversation.lastTimestamp = n;
+                    conversation.lastMessage = '';
+                    conversation.name = recipientName;
+                    conversation.avatar = recipientAvatar;
+                    conversation.members[this.userId] = this._createMember(this.userName);
+                    conversation.members[recipientId] = this._createMember(recipientName);
+
+                    this.conversations[recipientId] = conversation;
+
+                    recipientConversation.lastTimestamp = n;
+                    recipientConversation.lastMessage = '';
+                    recipientConversation.name = this.userName;
+                    recipientConversation.avatar = this.userAvatar;
+                    recipientConversation.members[this.userId] = this._createMember(this.userName);
+                    recipientConversation.members[recipientId] = this._createMember(recipientName);
+
+                    initialize = true;
+                }
+                else
+                {
+                    recipientConversation = this.conversations[recipientId];
+                }
+
+                    console.log("HIER ?!?!");
+                
+                if (initialize) {
+                    console.log("Creating a chat room??");
+                    FAT.createValue(this.$.conversationsQuery, this.$.conversationsQuery.path, '/conversations', this.conversations);
+                    FAT.createValue(this.$.conversationsQuery, '/users2/' + recipientId + '/conversations', '/' + this.userId, recipientConversation);
+                }
+
+                this.currentChatId = recipientId;
+                this.currentChatName = recipientName;
+                this.currentChatAvatar = recipientAvatar;
+                this.isAddChat = false;
+            },            
+            _createMember: function(memberName) {
+                return {
+                    name: memberName
+                }
+            },
+            _onChangeUserId: function() {
+                this.$.conversationsQuery.disabled = !this.userId;
+            },
+            _onChangeUser: function(newValue, oldValue) {
+                if (!!newValue && newValue.hasOwnProperty('conversations')) {
+                    this.conversations = newValue.conversations;
+                }
+                //this.addUsers = this._computeUsersToChatWith();
+            },
+            _onChangeUsers: function(newValue, oldValue) {
+                //this.addUsers = this._computeUsersToChatWith();
+            },
+            _computeUsersToChatWith: function () {
+                if (!this.userId || !this.users) {
+                    return [];
+                }
+
+                // get all user ids from open conversations
+                var openChatUserIds = [];
+                if (!!this.conversations && this.conversations) {
+                    for (var convKey in this.conversations) {
+                        for (var memberKey in this.conversations[convKey].members) {
+                            if (memberKey !== this.userId) {
+                                openChatUserIds.push(memberKey);
+                            }
+                        }
+                    }
+                }
+
+                // build list of users that you can start a new chat with, but excluding
+                // your own user and users that you're already chatting with
+                var usersToChatWith = [];
+                for (var userIndex in this.users) {
+                    var currentUser = this.users[userIndex];
+                    var yourSelf = (currentUser.$key === this.userId);
+                    var hasChatWith = openChatUserIds.indexOf(currentUser.$key) >= 0;
+                    if (!yourSelf && !hasChatWith) {
+                        usersToChatWith.push(currentUser);
+                    } else {
+                        console.debug('Excluding user ' + currentUser.name + ' from the New Chat list because ' +
+                                (yourSelf ?
+                                        "that's you!" :
+                                        "you're already chatting with this person!")
+                        );
+                    }
+                }
+
+                return usersToChatWith;
+            }            
+        });
+    </script>
+</dom-module>

@@ -1,0 +1,98 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/google-signin/google-signin.html">
+<link rel="import" href="../../../bower_components/google-signin/google-signin-aware.html">
+<link rel="import" href="../../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-scroll-header-panel/paper-scroll-header-panel.html">
+<link rel="import" href="../../behaviors/fat-behavior.html">
+
+<dom-module id="fat-add-item">
+
+    <template>
+        <style is="custom-style">
+            :host {
+                display: block;
+                height: 60px;
+                line-height: 20px;
+                font-size: 14px;
+                padding: 15px 15px 10px 15px;
+                background-color: white;
+                border-bottom: 1px solid #FFBF47;
+                box-shadow: 0px 0px 1px 1px rgba(0,0,0,0.18);
+            }
+
+            :host:hover {
+                cursor: pointer;
+                background-color: #f3f3f3;
+            }
+            
+            paper-item-body div:first-child {
+                color: #000;
+                font-size: 15px;
+            }
+
+            paper-item-body {
+                color: #888;
+                font-size: 14px;
+            }
+            
+            paper-icon-item img {
+                float: left;
+                border-radius: 22px;
+                width: 44px;
+                margin-right: 10px;
+            }
+
+            paper-icon-item span {
+                float: right;
+                font-size: 12px;
+                color: #888;
+            }
+
+        </style>
+        
+        <paper-icon-item>
+            <img src="{{userAvatar}}"/>
+            <paper-item-body two-line>
+                <div>{{userName}}</div>
+                <div secondary></div>
+            </paper-item-body>
+        </paper-icon-item>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'fat-add-item',
+            behaviors: [FAT],
+            properties: {
+                userId: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                userName: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                userAvatar: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                }
+            }
+        });
+    </script>
+</dom-module>

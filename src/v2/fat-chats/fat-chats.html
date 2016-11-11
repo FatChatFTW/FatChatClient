@@ -1,0 +1,151 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../bower_components/app-layout/app-box/app-box.html">
+<link rel="import" href="../../../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../../bower_components/app-route/app-location.html">
+
+<link rel="import" href="../../../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../../bower_components/paper-badge/paper-badge.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+
+<link rel="import" href="../../fat-chat-shared-styles/fat-chat-shared-styles.html"/>
+<link rel="import" href="../fat-me/fat-me.html"/>
+<link rel="import" href="../fat-overview/fat-overview.html"/>
+<link rel="import" href="../fat-chat/fat-chat.html"/>
+<link rel="import" href="../fat-add/fat-add.html"/>
+
+<dom-module id="fat-chats">
+    <template>
+        <style include="shared-styles"></style>
+        <style is="custom-style">
+            
+            app-drawer {
+                position: absolute;
+                bottom: 0px;
+                --app-drawer-width: 350px;
+                --app-drawer-content-container: {
+                    background: #FFE2AD;
+                    box-shadow: 1px 0 2px 1px rgba(0,0,0,0.18);
+                }
+                --app-drawer-scrim-background: #ddd;
+            }
+            
+            fat-chat {
+                overflow: hidden;
+                position: absolute;
+                left: 350px;
+                right: 0px;
+                top: 0px;
+                bottom: 0px;
+            }
+        </style>
+
+
+        <app-drawer-layout>
+            <app-drawer>
+                <!-- Me toolbar -->
+                <fat-me user-id="{{userId}}" user-name="{{userName}}" user-avatar="{{userAvatar}}" is-add-chat="{{isAddChat}}"></fat-me>
+
+                <!-- Conversations -->
+                <template is="dom-if" if="{{!isAddChat}}">
+                    <fat-overview 
+                        user-id="{{userId}}" 
+                        current-chat-name="{{currentChatName}}" 
+                        current-chat-avatar="{{currentChatAvatar}}" 
+                        current-chat-id="{{currentChatId}}">
+                    </fat-overview>
+                </template>
+
+                <!-- Add Chat -->
+                <template is="dom-if" if="{{isAddChat}}">
+                    <fat-add
+                        user-id="{{userId}}" 
+                        user-name="{{userName}}" 
+                        user-avatar="{{userAvatar}}"                         
+                        current-chat-name="{{currentChatName}}" 
+                        current-chat-avatar="{{currentChatAvatar}}" 
+                        current-chat-id="{{currentChatId}}"
+                        is-add-chat="{{isAddChat}}">
+                    </fat-add>
+                </template>
+
+            </app-drawer>
+
+
+        </app-drawer-layout>
+        
+        <!-- Chat History -->
+        <template is="dom-if" if="{{currentChatId}}">
+            <fat-chat 
+                user-id="{{userId}}" 
+                user-name="{{userName}}"
+                current-chat-name="{{currentChatName}}" 
+                current-chat-avatar="{{currentChatAvatar}}" 
+                current-chat-id="{{currentChatId}}">
+            </fat-chat>
+        </template>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'fat-chats',
+            behaviors: [FAT],
+            properties: {
+                userId: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                userName: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },                
+                userAvatar: {
+                    type: String,
+                    value: false,
+                    notify: true
+                },
+                currentChatId: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true,
+                    observer: 'track'
+                },
+                currentChatName: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                currentChatAvatar: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                isAddChat: {
+                    type: Boolean,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                }                
+            },
+            track: function() {
+                console.log('Chatting with ' + this.currentChatName + ' (' + this.currentChatId + ')')
+            }
+        });
+    </script>
+    
+</dom-module>

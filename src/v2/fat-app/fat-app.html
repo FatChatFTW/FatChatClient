@@ -1,0 +1,126 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../../bower_components/app-layout/app-box/app-box.html">
+<link rel="import" href="../../../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+
+<link rel="import" href="../../../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../../bower_components/paper-badge/paper-badge.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/paper-progress/paper-progress.html">
+
+<link rel="import" href="../../fat-chat-shared-styles/fat-chat-shared-styles.html"/>
+<link rel="import" href="../fat-chats/fat-chats.html"/>
+<link rel="import" href="../fat-login/fat-login.html"/>
+
+<dom-module id="fat-app">
+    <template>
+        <style include="shared-styles"></style>
+        <style is="custom-style">
+            :host {
+                display: block;
+                font-family: Helvetica, Arial, sans-serif;
+            }
+            
+            .background {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image: url('../../../assets/img/doodle.jpg');
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                background-size: cover;
+                opacity: 0.1;
+                filter:alpha(opacity=90);        
+            }
+            
+            app-box {
+                position: fixed;
+                left: 100px;
+                right: 100px;
+                top: 50px;
+                bottom: 50px;
+                overflow-y: auto;
+                background-color: #ccc;
+                border: 1px solid #eee;
+                width: auto;
+                height: auto;
+                box-shadow: 2px 3px 10px rgba(0, 0, 0, 0.4);
+            }
+
+            paper-progress {
+                position: fixed;
+                top: 50%;
+                left: 40%;
+                width: 20%;
+                height: auto;
+                --paper-progress-active-color: orange;
+            }
+        </style>
+
+        <!-- Spinner -->
+        <template is="dom-if" if="{{!isReady}}">
+            <paper-progress indeterminate></paper-progress>
+        </template>
+
+        <!-- Database -->
+        <firebase-app
+            name="fat-data"
+            auth-domain="fat-chat-ftw.firebaseapp.com"
+            database-url="https://fat-chat-ftw.firebaseio.com"
+            api-key="AIzaSyDWMntDTDLVwWNNMdi9m8kC1yOUETx4hCo">
+        </firebase-app> 
+
+        <!-- Screens -->
+        <template is="dom-if" if="{{isReady}">
+            <div class="background"></div>
+            <app-box>
+                <template is="dom-if" if="{{!userId}}">
+                    <fat-login user-id="{{userId}}" user-name="{{userName}}" user-avatar="{{userAvatar}}" is-ready="{{isReady}}"></fat-login>
+                </template>
+                <template is="dom-if" if="{{userId}}">
+                    <fat-chats user-id="{{userId}}" user-name="{{userName}}" user-avatar="{{userAvatar}}"></fat-chats>
+                </template>
+            </app-box>
+        </template>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'fat-app',
+            properties: {
+                userId: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },
+                userName: {
+                    type: String,
+                    value: false,
+                    notify: true,
+                    reflectToAttribute: true
+                },                
+                userAvatar: {
+                    type: String,
+                    value: false,
+                    notify: true
+                },
+                isReady: {
+                    type: Boolean,
+                    value: false,
+                    notify: true
+                }
+            }
+        });
+    </script>
+    
+</dom-module>
