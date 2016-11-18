@@ -46,7 +46,7 @@
         </firebase-query>
 
         <!-- Chat history -->
-        <template is="dom-repeat" items="{{users}}" as="user">
+        <template is="dom-repeat" items="{{usersToChatWith}}" as="user">
             <fat-add-item 
                 user-id="{{user.key}}" 
                 user-name="{{user.name}}" 
@@ -105,19 +105,17 @@
                 },                 
                 users: {
                     type: Object,
-                    notify: true,
-                    observer: '_onChangeUsers'
-                },    
+                    notify: true
+                },
+                usersToChatWith: {
+                    type: Array,
+                    computed: "_computeUsersToChatWith(userId, users, conversations)"
+                },
                 conversations: {
                     type: Object,
                     value: null,
                     notify: true
                 },
-                addUserList: {
-                    type: Array,
-                    value: null,
-                    notify: true
-                },     
                 isAddChat: {
                     type: Boolean,
                     value: false,
@@ -206,46 +204,39 @@
                 if (!!newValue && newValue.hasOwnProperty('conversations')) {
                     this.conversations = newValue.conversations;
                 }
-                //this.addUsers = this._computeUsersToChatWith();
             },
-            _onChangeUsers: function(newValue, oldValue) {
-                //this.addUsers = this._computeUsersToChatWith();
-            },
-            _computeUsersToChatWith: function () {
-                if (!this.userId || !this.users) {
+            _computeUsersToChatWith: function (userId, users, conversations) {
+                if (userId == null || users == null) {
                     return [];
                 }
-
                 // get all user ids from open conversations
                 var openChatUserIds = [];
-                if (!!this.conversations && this.conversations) {
-                    for (var convKey in this.conversations) {
-                        for (var memberKey in this.conversations[convKey].members) {
+                if (conversations !== null && conversations) {
+                    for (var convKey in conversations) {
+                        for (var memberKey in conversations[convKey].members) {
                             if (memberKey !== this.userId) {
                                 openChatUserIds.push(memberKey);
                             }
                         }
                     }
                 }
-
                 // build list of users that you can start a new chat with, but excluding
                 // your own user and users that you're already chatting with
                 var usersToChatWith = [];
-                for (var userIndex in this.users) {
-                    var currentUser = this.users[userIndex];
-                    var yourSelf = (currentUser.$key === this.userId);
+                for (var userIndex in users) {
+                    var currentUser = users[userIndex];
+                    var yourSelf = (currentUser.$key === userId);
                     var hasChatWith = openChatUserIds.indexOf(currentUser.$key) >= 0;
                     if (!yourSelf && !hasChatWith) {
                         usersToChatWith.push(currentUser);
                     } else {
                         console.debug('Excluding user ' + currentUser.name + ' from the New Chat list because ' +
-                                (yourSelf ?
-                                        "that's you!" :
-                                        "you're already chatting with this person!")
+                            (yourSelf ?
+                                "that's you!" :
+                                "you're already chatting with this person!")
                         );
                     }
                 }
-
                 return usersToChatWith;
             }            
         });
