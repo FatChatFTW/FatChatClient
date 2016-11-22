@@ -93,8 +93,8 @@
                 position: absolute;
                 top: 66px;
                 bottom: 76px;
-                left: 2px;
                 right: 0px;
+                left: 0px;
                 overflow: auto;
                 box-shadow: inset 0 0 5px rgba(0,0,0,0.18);
                 border-bottom: 1px solid #bbb;
@@ -113,8 +113,15 @@
             data="{{messages}}">
         </firebase-query>
         
+        <firebase-query
+            id="recipientMessagesQuery"
+            app-name="fat-data"
+            path="/users2/[[currentChatId]]/conversations/[[userId]]/messages"
+            data="{{recipientMessages}}">
+        </firebase-query>
+        
         <firebase-document
-            id="chatQuery"
+            id="conversationQuery"
             app-name="fat-data"
             path="/users2/[[userId]]/conversations/[[currentChatId]]"
             data="{{conversation}}"
@@ -122,7 +129,7 @@
         </firebase-document>
 
         <firebase-document
-            id="recipientQuery"
+            id="recipientConversationQuery"
             app-name="fat-data"
             path="/users2/[[currentChatId]]/conversations/[[userId]]"
             data="{{recipientConversation}}"
@@ -173,32 +180,31 @@
                     type: String,
                     value: false,
                     notify: true,
-                    reflectToAttribute: true,
                     observer: '_onChangeUserId'   
                 },
                 currentChatName: {
                     type: String,
                     value: false,
-                    notify: true,
-                    reflectToAttribute: true
+                    notify: true
                 },
                 currentChatAvatar: {
                     type: String,
                     value: false,
-                    notify: true,
-                    reflectToAttribute: true
+                    notify: true
                 },
                 conversation: {
                     type: Object,
-                    notify: true,
-                    observer: '_onChangeChat'   
+                    notify: true   
                 },
                 recipientConversation: {
                     type: Object,
-                    notify: true,
-                    observer: '_onChangeRecipient'   
+                    notify: true   
                 },
                 messages: {
+                    type: Array,
+                    notify: true                     
+                },                
+                recipientMessages: {
                     type: Array,
                     notify: true                     
                 }                
@@ -219,14 +225,6 @@
                 return FAT.shortTime(lastTimestamp);
             },
             createMessage: function(e) {
-                var messages = this.conversation.hasOwnProperty('messages')
-                    ? this.conversation.messages
-                    : [];
-
-                var recipientMessages = this.recipientConversation.hasOwnProperty('messages')
-                    ? this.recipientConversation.messages
-                    : [];
-                    
                 var message = e.target.value;
                 var timestamp = Date.now();
                 var guid = this.guid();
@@ -238,34 +236,38 @@
                 msg.name = this.userName;
                 msg.time = timestamp;
                 msg.message = message;
-                
-                messages[guid] = msg;
-                recipientMessages[guid] = msg;
-                
-                this.conversation.messages = messages;
-                this.conversation.lastTimestamp = timestamp;
-                this.conversation.lastMessage = message;
-                this.conversation.messageCount = 0; 
-                
-                this.recipientConversation.messages = recipientMessages;
-                this.recipientConversation.lastTimestamp = timestamp;
-                this.recipientConversation.lastMessage = message;
-                if (!this.recipientConversation.hasOwnProperty('messageCount')) {
-                    this.recipientConversation.messageCount = 0;                    
-                }
-                this.recipientConversation.messageCount++;
-                
-                // console.log("--- create message ---");
-                // console.log("ME:");
-                // console.log(this.$.chatQuery.path);
-                // console.log(this.conversation.name);
-                // console.log("RECIPIENT:");
-                // console.log(this.$.recipientQuery.path);
-                // console.log(this.recipientConversation.name);
-                
-                FAT.updateValue(this.$.chatQuery, this.$.chatQuery.path, this.conversation);
-                FAT.updateValue(this.$.recipientQuery, this.$.recipientQuery.path, this.recipientConversation);
 
+                var msgList = {};
+                msgList[guid] = msg;
+                
+                var recipientMsgCount = this.recipientConversation.hasOwnProperty('messageCount') 
+                    ? (this.recipientConversation.messageCount + 1) 
+                    : 0;
+
+                this.set('conversation.name', this.currentChatName);
+                this.set('conversation.avatar', this.currentChatAvatar);
+                this.set('conversation.lastTimestamp', timestamp);
+                this.set('conversation.lastMessage', message);
+                this.set('conversation.messageCount', 0);
+
+                if (this.conversation.hasOwnProperty('messages')) {
+                    this.set('conversation.messages.' + guid, msg);
+                } else {
+                    this.set('conversation.messages', msgList);
+                }
+                
+                this.set('recipientConversation.name', this.userName);
+                this.set('recipientConversation.avatar', this.userAvatar);
+                this.set('recipientConversation.lastTimestamp', timestamp);
+                this.set('recipientConversation.lastMessage', message);
+                this.set('recipientConversation.messageCount', recipientMsgCount);
+
+                if (this.recipientConversation.hasOwnProperty('messages')) {
+                    this.set('recipientConversation.messages.' + guid, msg);
+                } else {
+                    this.set('recipientConversation.messages', msgList);
+                }
+                
             },
             guid: function() {
                 return this.s4() + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' +
@@ -290,31 +292,37 @@
                 // this problem will hopefully be solved.
                 
                 var idsValid = !!this.userId && !!this.currentChatId;
-                this.$.chatQuery.disabled = idsValid;
-                this.$.recipientQuery.disabled = idsValid;
                 
-                // console.log("Change chat id valid = " + idsValid);
+                this.$.conversationQuery.disabled = idsValid;
+                this.$.recipientConversationQuery.disabled = idsValid;
                 
                 if (idsValid) {
-                    this.$.chatQuery.disabled = true;
-                    this.$.chatQuery.path = null;
-                    this.$.chatQuery.path = '/users2/' + this.userId + '/conversations/' + this.currentChatId;
-                    this.$.chatQuery.disabled = false;
-                    this.$.recipientQuery.path = null;
-                    this.$.recipientQuery.path = '/users2/' + this.currentChatId + '/conversations/' + this.userId;
+                    
+                    this.$.conversationQuery.disabled = true;
+                    this.$.conversationQuery.path = null;
+                    this.$.conversationQuery.path = '/users2/' + this.userId + '/conversations/' + this.currentChatId;
+                    this.$.conversationQuery.disabled = false;
+
+                    this.$.recipientConversationQuery.disabled = true;
+                    this.$.recipientConversationQuery.path = null;
+                    this.$.recipientConversationQuery.path = '/users2/' + this.currentChatId + '/conversations/' + this.userId;
+                    this.$.recipientConversationQuery.disabled = false;
+
+                    this.$.recipientMessagesQuery.path = null;
+                    this.$.recipientMessagesQuery.path = '/users2/' + this.currentChatId + '/conversations/' + this.userId;
+                    
                     this.$.messagesQuery.path = null;
                     this.$.messagesQuery.path = '/users2/' + this.userId + '/conversations/' + this.currentChatId + '/messages';
+
+                    console.log("Change IDs = VALID");
+                    console.log("Messages path = " + this.$.messagesQuery.path);
+                    console.log("----------");
+
                 }
             },
             _onChangeChat: function() {
-                    // console.log("--- update chat ---");
-                    // console.log(this.$.chatQuery.path);
-                    // console.log("I am chatting with: " + this.conversation.name);
             },
             _onChangeRecipient: function() {
-                    // console.log("--- update recipient ---");
-                    // console.log(this.$.recipientQuery.path);
-                    // console.log("Recipient chat with (me): " + this.recipientConversation.name);            
             }
         });
     </script>
