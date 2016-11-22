@@ -46,8 +46,8 @@
         </firebase-query>
 
         <!-- Chat history -->
-        <template is="dom-repeat" items="{{usersToChatWith}}" as="user">
-            <fat-add-item 
+        <template is="dom-repeat" items="{{users}}" as="user" filter="newUser">
+            <fat-add-item
                 user-id="{{user.key}}" 
                 user-name="{{user.name}}" 
                 user-avatar="{{user.avatar}}" 
@@ -107,10 +107,6 @@
                     type: Object,
                     notify: true
                 },
-                usersToChatWith: {
-                    type: Array,
-                    computed: "_computeUsersToChatWith(userId, users, conversations)"
-                },
                 conversations: {
                     type: Object,
                     value: null,
@@ -120,7 +116,13 @@
                     type: Boolean,
                     value: false,
                     notify: true
-                }                  
+                }
+            },
+            newUser: function(item){
+                if (this.userId === item.$key){
+                    return false;
+                }
+                return true;
             },
             addChat: function (e) {
                 var recipientId = e.model.user.$key;
