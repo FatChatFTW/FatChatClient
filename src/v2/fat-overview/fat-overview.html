@@ -99,6 +99,8 @@
                 this.currentChatName = e.model.conversation.name;
                 this.currentChatAvatar = e.model.conversation.avatar;
                 this.currentChatId = e.model.conversation.$key;
+                
+                e.model.set('conversation.messageCount', 0);
             },
             _sortConversations: function() {
                 console.log("Rerender conversations");
