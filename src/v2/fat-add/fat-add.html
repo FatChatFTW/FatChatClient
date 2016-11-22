@@ -26,6 +26,15 @@
             :host {
                 overflow: auto;
             }
+            
+            .monkeys {
+                overflow-y: auto;
+                position: absolute;
+                top: 185px;
+                left: 0;
+                right: 0;
+                bottom: 0;
+            }
         </style>
 
         <!-- Database -->
@@ -46,14 +55,17 @@
         </firebase-query>
 
         <!-- Chat history -->
-        <template is="dom-repeat" items="{{users}}" as="user" filter="newUser">
-            <fat-add-item
-                user-id="{{user.key}}" 
-                user-name="{{user.name}}" 
-                user-avatar="{{user.avatar}}" 
-                on-tap="addChat">
-            </fat-add-item>
-        </template>
+        <div class='monkeys'>
+            <template is="dom-repeat" items="{{users}}" as="user" filter="newUser">
+                <fat-add-item
+                    user-id="{{user.key}}" 
+                    user-name="{{user.name}}" 
+                    user-avatar="{{user.avatar}}" 
+                    on-tap="addChat">
+                </fat-add-item>
+            </template>
+        </div>
+        
         
     </template>
 
