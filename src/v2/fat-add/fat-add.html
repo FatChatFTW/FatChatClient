@@ -36,7 +36,7 @@
             data="{{user}}"
             disabled="true">
         </firebase-document>
-        
+
         <firebase-query
             app-name="fat-data"
             id="usersQuery"
@@ -121,8 +121,9 @@
             newUser: function(item){
                 if (this.userId === item.$key){
                     return false;
+                }else {
+                    return this.filterConversations(item.$key);
                 }
-                return true;
             },
             addChat: function (e) {
                 var recipientId = e.model.user.$key;
@@ -207,39 +208,21 @@
                     this.conversations = newValue.conversations;
                 }
             },
-            _computeUsersToChatWith: function (userId, users, conversations) {
-                if (userId == null || users == null) {
-                    return [];
+            filterConversations: function (addUserId) {
+                if (addUserId == null){
+                    return false;
                 }
-                // get all user ids from open conversations
-                var openChatUserIds = [];
+                var conversations = this.conversations;
                 if (conversations !== null && conversations) {
                     for (var convKey in conversations) {
                         for (var memberKey in conversations[convKey].members) {
-                            if (memberKey !== this.userId) {
-                                openChatUserIds.push(memberKey);
+                            if (memberKey === addUserId) {
+                                return false;
                             }
                         }
                     }
                 }
-                // build list of users that you can start a new chat with, but excluding
-                // your own user and users that you're already chatting with
-                var usersToChatWith = [];
-                for (var userIndex in users) {
-                    var currentUser = users[userIndex];
-                    var yourSelf = (currentUser.$key === userId);
-                    var hasChatWith = openChatUserIds.indexOf(currentUser.$key) >= 0;
-                    if (!yourSelf && !hasChatWith) {
-                        usersToChatWith.push(currentUser);
-                    } else {
-                        console.debug('Excluding user ' + currentUser.name + ' from the New Chat list because ' +
-                            (yourSelf ?
-                                "that's you!" :
-                                "you're already chatting with this person!")
-                        );
-                    }
-                }
-                return usersToChatWith;
+                return true;
             }            
         });
     </script>
